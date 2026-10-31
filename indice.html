@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Adivina la canción: Aitana y Mafalda Cardenal</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef3fb;--card:#fff;--ink:#14224a;--mute:#56648c;--line:#d3dcf0;--ac:#2f5bff;--acink:#fff;--ok:#12805c;--bad:#c62f4b;--on:#ffc93c;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1630;--card:#18234a;--ink:#eef1fb;--mute:#a4afd3;--line:#2e3b6b;--ac:#86a0ff;--acink:#0c1330;--ok:#4ed3a0;--bad:#ff7d93}}
+:root[data-theme="dark"]{--bg:#0e1630;--card:#18234a;--ink:#eef1fb;--mute:#a4afd3;--line:#2e3b6b;--ac:#86a0ff;--acink:#0c1330;--ok:#4ed3a0;--bad:#ff7d93}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:620px;margin:0 auto;padding:24px 16px 40px}
+h1{font:800 clamp(2rem,8vw,3rem)/1 "Bricolage Grotesque",system-ui,sans-serif;margin:0 0 6px;letter-spacing:-.02em}
+.sub{color:var(--mute);margin:0 0 20px}
+nav{display:flex;flex-wrap:wrap;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:5px;margin-bottom:16px}
+nav button{flex:1 1 auto;border:0;background:none;color:var(--mute);font-family:inherit;font-weight:600;font-size:.95rem;padding:10px 8px;border-radius:10px;cursor:pointer}
+nav button[aria-selected=true]{background:var(--ac);color:var(--acink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;color:var(--mute);font-size:.9rem}
+.score{font:800 1.3rem "Bricolage Grotesque",system-ui,sans-serif;color:var(--ink)}
+button{font-family:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.btn{border:0;border-radius:12px;padding:12px 18px;font-weight:700;font-size:1rem;cursor:pointer;background:var(--ac);color:var(--acink)}
+.btn.alt{background:none;border:1px solid var(--line);color:var(--ink)}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+select,input[type=text]{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+input[type=text]{flex:1;min-width:0}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.opts button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:12px;padding:12px 8px;font-size:.95rem;cursor:pointer}
+.opts button.bad{color:var(--bad);border-color:var(--bad)}
+.opts button.good{background:var(--ok);color:var(--acink);border-color:var(--ok)}
+.msg{min-height:1.6em;font-weight:600;margin:10px 0 0}
+.msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}.msg.warm{color:var(--ac)}
+.clues{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:8px}
+.clues li{background:var(--bg);border-left:4px solid var(--ac);border-radius:8px;padding:10px 12px}
+.clues li.big{font-size:2.4rem;line-height:1.2;text-align:center;border-left:0}
+.hint{color:var(--mute);font-size:.88rem;margin-top:14px}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.filters label{display:flex;flex-direction:column;gap:3px;flex:1;min-width:140px;font-size:.8rem;color:var(--mute)}
+.kb{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
+.kb button{width:38px;height:42px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;font-weight:700;cursor:pointer}
+.kb button:disabled{opacity:.4;cursor:default}
+.kb button.good{background:var(--ok);color:var(--acink);opacity:1}
+.kb button.bad{color:var(--bad);border-color:var(--bad)}
+.mem{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mem button{min-height:72px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:12px;padding:8px;font-size:.9rem;cursor:pointer}
+.mem button.sel{outline:3px solid var(--ac)}
+.mem button.wrong{border-color:var(--bad);color:var(--bad)}
+.mem button.done{background:var(--on);border-color:var(--on);color:#1b2340;font-weight:700}
+@media (max-width:420px){.opts{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Adivina la canción: Aitana y Mafalda Cardenal</h1>
+  <p class="sub">Trece juegos con la música de Aitana y de Mafalda Cardenal. Elige una pestaña.</p>
+  <div class="filters">
+    <label>Tipo<select id="ftipo"><option>Todos</option><option>Música</option><option>Letra</option></select></label>
+    <label>Categoría<select id="fcat"><option>Todas</option><option>Primeros años</option><option>11 Razones</option><option>Alpha</option><option>Cuarto azul</option><option>Colaboraciones</option><option>Singles sueltos</option><option>Mafalda Cardenal</option></select></label>
+    <label>Tema<select id="ftema"><option>Todos</option><option>Amor</option><option>Desamor</option><option>Superación</option><option>Fiesta y baile</option></select></label>
+  </div>
+  <p class="hint" style="margin:0 0 14px">Música: datos de las canciones (álbum, dúos, año, artista). Letra: juegos con palabras (emojis, pistas y títulos revueltos). No uso letras reales por derechos de autor. Tema: el sentimiento principal de la canción, según lo que dicen la prensa y las propias artistas; las canciones sin tema solo salen en «Todos».</p>
+  <nav role="tablist" id="tabs">
+    <button role="tab" aria-selected="true" data-t="emoji">Emojis</button>
+    <button role="tab" aria-selected="false" data-t="clues">Pistas</button>
+    <button role="tab" aria-selected="false" data-t="alb">Álbum</button>
+    <button role="tab" aria-selected="false" data-t="col">Dúos</button>
+    <button role="tab" aria-selected="false" data-t="era">Época</button>
+    <button role="tab" aria-selected="false" data-t="rev">Revuelto</button>
+    <button role="tab" aria-selected="false" data-t="art">Artista</button>
+    <button role="tab" aria-selected="false" data-t="hang">Ahorcado</button>
+    <button role="tab" aria-selected="false" data-t="gap">Palabra</button>
+    <button role="tab" aria-selected="false" data-t="pair">Parejas</button>
+    <button role="tab" aria-selected="false" data-t="tf">V o F</button>
+    <button role="tab" aria-selected="false" data-t="trivia">Trivia</button>
+    <button role="tab" aria-selected="false" data-t="plot">De qué va</button>
+  </nav>
+  <section class="card" id="emoji"></section>
+  <section class="card" id="clues" hidden></section>
+  <section class="card" id="alb" hidden></section>
+  <section class="card" id="col" hidden></section>
+  <section class="card" id="era" hidden></section>
+  <section class="card" id="rev" hidden></section>
+  <section class="card" id="art" hidden></section>
+  <section class="card" id="hang" hidden></section>
+  <section class="card" id="gap" hidden></section>
+  <section class="card" id="pair" hidden></section>
+  <section class="card" id="tf" hidden></section>
+  <section class="card" id="trivia" hidden></section>
+  <section class="card" id="plot" hidden></section>
+</main>
+<script>
+const $=(s,r=document)=>r.querySelector(s);
+const norm=s=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9 ]/g,"").trim();
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const sh=a=>a.slice().sort(()=>Math.random()-.5);
+const IDS=["emoji","clues","alb","col","era","rev","art","hang","gap","pair","tf","trivia","plot"];
+$("#tabs").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  document.querySelectorAll("#tabs button").forEach(x=>x.setAttribute("aria-selected",x===b));
+  IDS.forEach(id=>$("#"+id).hidden=id!==b.dataset.t);
+});
+const mk=(t,k,c,...alts)=>({t,k,c,a:[t,...alts].map(norm)});
+const G={cat:"Todas",tipo:"Todos",tema:"Todos"},HOOKS=[],CAT={};
+const TH={"nada sale mal":"Amor","los angeles":"Amor","mi amor":"Amor","mon amour":"Amor","tu fan":"Desamor","solo un nombre":"Desamor","corazon sin vida":"Desamor","cuando te fuiste":"Desamor","carolina cuidale mejor que yo":"Desamor","a ella la llevas a paris":"Desamor","no estabamos juntos":"Superación","las babys":"Fiesta y baile","formentera":"Fiesta y baile","duele un monton despedirme de ti":"Desamor","desde que no estas":"Desamor","creo que te quiero":"Amor","cancion de amor":"Amor","ex ex ex":"Desamor","desde que ya no hablamos":"Desamor","no te has ido y ya te extrano":"Desamor","si no vas a volver":"Desamor","estupidez":"Desamor","esto iba a ser una cancion de amor":"Desamor"};
+const okF=(t,k)=>(G.cat==="Todas"||k===G.cat)&&(G.tema==="Todos"||TH[norm(t)]===G.tema);
+const EX={"spoiler":"Primeros años","11 razones":"11 Razones","alpha":"Alpha","cuarto azul":"Cuarto azul","mis notas de voz":"Mafalda Cardenal","superhumano":"Mafalda Cardenal","perdimos la razon":"Primeros años","mas":"11 Razones","darari":"Alpha","menos":"Colaboraciones","si tu la quieres":"Colaboraciones","aunque no sea conmigo":"Colaboraciones","la chica perfecta":"Colaboraciones","para que volver":"Colaboraciones","mon amour":"Colaboraciones","arde":"Primeros años","friend de semana":"Colaboraciones","hoy es tu cumpleanos":"Colaboraciones","duele un monton despedirme de ti":"Colaboraciones","la cancion que no quiero cantarte":"Colaboraciones","solo si es contigo":"Colaboraciones","cancion de amor":"Mafalda Cardenal","mi chico":"Mafalda Cardenal","normal":"Mafalda Cardenal","ella bailaba":"Alpha","the killers":"Alpha","ella era yo":"Mafalda Cardenal","no hablamos el mismo idioma":"Mafalda Cardenal","tie my shoes":"Mafalda Cardenal","para mi mejor amiga":"Mafalda Cardenal","cuando hables con el":"Cuarto azul","lia":"Cuarto azul","nada mal":"Mafalda Cardenal","la historia de nosotros":"Mafalda Cardenal","que tiene":"Mafalda Cardenal","que significa el amor":"Mafalda Cardenal"};
+const CATOF=t=>CAT[norm(t)]||EX[norm(t)]||null;
+function lev(a,b){const m=a.length,n=b.length,d=Array.from({length:m+1},(_,i)=>[i,...Array(n).fill(0)]);for(let j=1;j<=n;j++)d[0][j]=j;for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[m][n]}
+function near(a,ans){
+  let best=0;
+  for(const k of ans){
+    const x=a.replace(/ /g,""),y=k.replace(/ /g,""),r=1-lev(x,y)/Math.max(x.length,y.length,1);
+    const wa=a.split(" ").filter(w=>w.length>=3),wk=k.split(" ").filter(w=>w.length>=3),c=wa.filter(w=>wk.includes(w)).length;
+    let l=0;
+    if(r>=.8||(wk.length>=3&&c>=wk.length-1))l=2;else if(r>=.6||c>0)l=1;
+    best=Math.max(best,l);
+  }
+  return best;
+}
+const NEAR=["No es esa.","Te estás acercando, sigue por ahí.","¡Casi! Estás muy cerca, revisa cómo lo has escrito."];
+const ALC={"Spoiler":"Primeros años","Tráiler (EP)":"Primeros años","11 Razones":"11 Razones","Alpha":"Alpha","Cuarto azul":"Cuarto azul"};
+const TYPE={emoji:"Letra",clues:"Letra",rev:"Letra",alb:"Música",col:"Música",era:"Música",art:"Música",hang:"Letra",gap:"Letra",pair:"Música",tf:"Música",trivia:"Música",plot:"Letra"};
+
+/* ---------- Texto con pistas progresivas (Emojis y Pistas) ---------- */
+function textGame(root,items,intro,big){
+  const g={it:null,n:1,score:0,done:false,used:[]};
+  items.forEach(x=>{
+    if(x.x)return;x.x=1;
+    const W=x.t.split(" ").length,L=norm(x.t).replace(/ /g,"").length,last=x.c[x.c.length-1];
+    const nt=norm(x.t).replace(/ /g,""),E=nt[nt.length-1].toUpperCase();
+    x.c=[...x.c.slice(0,-1),`Pertenece a la categoría «${x.k}»`,`El título tiene ${W} palabra${W>1?"s":""} y ${L} letras`,`La última letra del título es la «${E}»`,last];
+  });
+  root.innerHTML=`<div class="top"><span>${intro}</span><span class="score">Puntos: <span class="sc">0</span></span></div>
+  <ul class="clues"></ul>
+  <div class="row"><input type="text" placeholder="Título de la canción" aria-label="Tu respuesta" autocomplete="off"><button class="btn ok">Probar</button></div>
+  <div class="row"><button class="btn alt hb">Otra pista</button><button class="btn alt sk">Saltar</button></div>
+  <p class="msg" role="status"></p>`;
+  const ul=$(".clues",root),inp=$("input",root),msg=$(".msg",root);
+  items.forEach(x=>{CAT[norm(x.t)]=x.k});HOOKS.push(()=>next());
+  const total=()=>g.it.c.length;
+  function show(){
+    ul.innerHTML=g.it.c.slice(0,g.n).map((c,i)=>`<li${big&&i===0?' class="big"':''}>${c}</li>`).join("");
+    $(".hb",root).disabled=g.n>=total()||g.done;
+  }
+  function next(){
+    const pool=items.filter(x=>okF(x.t,x.k));
+    if(!pool.length){ul.innerHTML="<li>No hay canciones de esta categoría en este juego. Cambia el filtro.</li>";g.done=true;inp.disabled=true;msg.textContent="";$(".hb",root).disabled=true;return}
+    if(!pool.some(x=>!g.used.includes(x)))g.used=g.used.filter(x=>!pool.includes(x));
+    g.it=pick(pool.filter(x=>!g.used.includes(x)));g.used.push(g.it);
+    g.n=1;g.done=false;inp.value="";inp.disabled=false;msg.textContent="";msg.className="msg";
+    $(".ok",root).textContent="Probar";show();inp.focus({preventScroll:true});
+  }
+  function end(text,cls){g.done=true;msg.textContent=text;msg.className="msg "+cls;inp.disabled=true;$(".hb",root).disabled=true;$(".ok",root).textContent="Siguiente"}
+  $(".hb",root).onclick=()=>{if(g.n<total()){g.n++;show()}};
+  $(".sk",root).onclick=()=>{if(!g.done)end("Era: "+g.it.t,"bad");else next()};
+  function check(){
+    if(g.done){next();return}
+    const a=norm(inp.value);if(!a)return;
+    if(g.it.a.some(k=>a===k||(a.length>=4&&(k.includes(a)||a.includes(k))))){
+      const p=total()-g.n+1;g.score+=p;$(".sc",root).textContent=g.score;end(`¡Sí, es «${g.it.t}»! +${p} puntos`,"ok");
+    }else{const n=near(a,g.it.a);msg.textContent=n?NEAR[n]:"No es esa. Pide otra pista o prueba de nuevo.";msg.className="msg "+(n?"warm":"bad")}
+  }
+  $(".ok",root).onclick=check;
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter")check()});
+  next();
+}
+
+textGame($("#emoji"),[
+ mk("Lo malo","Primeros años",["😈👯‍♀️🎤","Dúo de Operación Triunfo con Ana Guerra","Número uno y cinco veces platino","Empieza por L"]),
+ mk("Nada sale mal","Primeros años",["🙅✅🍀","Del álbum Spoiler, 2019","Su álbum fue número 1 de ventas","Empieza por N"]),
+ mk("Los Ángeles","Alpha",["🌴🌆✨","Primer single de Alpha, 2023","Es triple platino en España","Empieza por L"]),
+ mk("Las Babys","Alpha",["👶💃🪩","Reinterpreta Saturday Night, de Whigfield","Es cuatro veces platino","Empieza por L"]),
+ mk("Formentera","Alpha",["🏝️⛵☀️","Con Nicki Nicole","Es siete veces platino en España","Empieza por F"]),
+ mk("Mi amor","Alpha",["💌💞🧡","Con Rels B","Su título se escribe todo junto","Empieza por M"],"miamor"),
+ mk("Segundo intento","Cuarto azul",["2️⃣🔁🎯","De Cuarto azul, 2025","Ese álbum tiene 19 canciones","Empieza por S"]),
+ mk("Sentimiento natural","Cuarto azul",["🌿💙🔥","Con Myke Towers","Myke Towers es de Puerto Rico","Empieza por S"]),
+ mk("Mariposas","Colaboraciones",["🦋✨🇮🇹","Con Sangiovanni","Tiene una versión italiana llamada Farfalle","Empieza por M"]),
+ mk("Cuando te fuiste","Colaboraciones",["🚪🚶‍♀️🎸","Versión En El Garaje con Natalia Lacunza","Es de su etapa más rockera","Empieza por C"]),
+ mk("Corazón sin vida","Colaboraciones",["❤️💀🎶","Con Sebastián Yatra","Yatra es colombiano","Empieza por C"]),
+ mk("Quieres","Colaboraciones",["👀💞❓","Con Emilia y Ptazeta","Emilia es argentina","Empieza por Q"]),
+ mk("Presiento","Colaboraciones",["🔮🤞💭","Con Morat","Morat es un grupo colombiano","Empieza por P"]),
+ mk("En el coche","Alpha",["🚗🌃🎶","Single de 2022","Después entró en Alpha","Es doble platino","Empieza por E"]),
+ mk("Teléfono","Primeros años",["📞📱🔥","Una de sus primeras canciones en solitario","Estuvo seis semanas en lo más alto de las listas","Es cuatro veces platino","Empieza por T"]),
+ mk("Vas a quedarte","Primeros años",["🛑🏠💔","Del EP Tráiler","Fue el segundo single de ese EP","Empieza por V"]),
+ mk("Con la miel en los labios","Primeros años",["🍯👄🌃","Es de Spoiler, 2019","Es doble platino","Empieza por C"]),
+ mk("Me quedo","Primeros años",["🧍‍♀️🔒","Es de Spoiler","Con Lola Indigo","Empieza por M"]),
+ mk("Más de lo que aposté","Colaboraciones",["🎲💸❤️","Salió en 2020","Con Morat","Empieza por M"]),
+ mk("Enemigos","Colaboraciones",["⚔️🤝🇲🇽","Salió en 2020","Con Reik","Empieza por E"]),
+ mk("Tu fan","Mafalda Cardenal",["🙋‍♀️💔📱","Se hizo viral en TikTok en 2023","Pasa de 100 millones de reproducciones en Spotify","Empieza por T"]),
+ mk("Vete a la luna","Mafalda Cardenal",["🌙🚀😤","Es de Mis notas de voz, su álbum debut","Fue un avance del álbum","Empieza por V"]),
+ mk("Solo un nombre","Mafalda Cardenal",["🏷️1️⃣✍️","Es de Mis notas de voz","Fue un avance del álbum","Empieza por S"]),
+ mk("En mi balcón","Mafalda Cardenal",["🪴🌆🎸","Es de Mis notas de voz","Fue un avance del álbum","Empieza por E"]),
+ mk("No estábamos juntos","Mafalda Cardenal",["🚫👫💔","Es de Mis notas de voz","Fue un single antes del álbum","Empieza por N"]),
+ mk("Esto iba a ser una canción de amor","Mafalda Cardenal",["✍️💌❌","Es de Mis notas de voz","Fue un avance del álbum","Empieza por E"]),
+ mk("Pa que me cantes en el coche","Mafalda Cardenal",["🚗🎤🎶","Es una de sus canciones más escuchadas","Empieza por P"]),
+ mk("A ella la llevas a París","Mafalda Cardenal",["👩🗼🇫🇷","Es una de sus canciones más escuchadas","Empieza por A"]),
+ mk("Venecia","Mafalda Cardenal",["🛶🇮🇹💘","Es la pista 14 de Mis notas de voz","Empieza por V"]),
+ mk("Arde","Primeros años",["🔥💃🎤","Fue su candidata en solitario a Eurovisión 2018","Nace en Operación Triunfo","Empieza por A"]),
+ mk("Mon amour","Colaboraciones",["🇫🇷💞🎶","Con Zzoilo","Tiene unos 100 millones de reproducciones en Spotify","Empieza por M"]),
+ mk("Friend de Semana","Colaboraciones",["👯‍♀️📅🔥","Con Danna Paola y Luísa Sonza","Empieza por F"]),
+ mk("Hoy es tu cumpleaños","Colaboraciones",["🎂📅🎉","Con Danny Ocean","Empieza por H"]),
+ mk("Duele un montón despedirme de ti","Colaboraciones",["👋💔😢","Con Jay Wheeler","Empieza por D"]),
+ mk("La canción que no quiero cantarte","Colaboraciones",["🎤🚫🎶","Con Amaia","Empieza por L"]),
+ mk("Apaga la luz","Mafalda Cardenal",["💡🌙🚪","Es la pista 2 de Mis notas de voz","Empieza por A"]),
+ mk("Déjame entrar","Mafalda Cardenal",["🚪🙏❤️","Es la pista 3 de Mis notas de voz","Empieza por D"]),
+ mk("Todo es azul","Mafalda Cardenal",["🔵🌊💙","Es la pista 9 de Mis notas de voz","Empieza por T"]),
+ mk("Carolina (cuídale mejor que yo)","Mafalda Cardenal",["💁‍♀️👫🙏","Es la pista 13 de Mis notas de voz","Empieza por C"],"carolina"),
+ mk("Superhumano","Mafalda Cardenal",["🦸‍♀️✨💪","Es la última pista de Mis notas de voz","Empieza por S"]),
+ mk("Desde que no estás","Mafalda Cardenal",["🕰️💔🚫","Es de su etapa Belonia","Empieza por D"]),
+ mk("Creo que te quiero","Mafalda Cardenal",["🤔❤️💭","Es de su etapa Belonia","Empieza por C"]),
+ mk("Gigantes","Mafalda Cardenal",["🗿👣⛰️","Es de su etapa Belonia","Empieza por G"]),
+ mk("Superestrella","Cuarto azul",["🌟🎤✨","Es de Cuarto azul","Empieza por S"]),
+ mk("Música en el cielo","Cuarto azul",["🎶☁️👴","Es de Cuarto azul","Es un recuerdo a su abuelo","Empieza por M"]),
+ mk("Conexión psíquica","Cuarto azul",["🔮🧠💫","Es de Cuarto azul","Empieza por C"],"conexion psiquica"),
+ mk("En el centro de la cama","Cuarto azul",["🛏️🌙💙","La cantó en Metamorfosis Season","Empieza por E"]),
+ mk("Nada mal","Mafalda Cardenal",["👍😌🎶","Es la pista 1 de Belonia","Empieza por N"]),
+ mk("La historia de nosotros","Mafalda Cardenal",["📖👫💔","Es la pista 2 de Belonia","Empieza por L"]),
+ mk("Trankis","Cuarto azul",["😌🧘‍♀️🛋️","Es de Cuarto azul","Empieza por T"]),
+ mk("Ex ex ex","Cuarto azul",["❌❌❌💔","Es de Cuarto azul","Empieza por E"]),
+ mk("Desde que ya no hablamos","Cuarto azul",["🔇📵💔","Es de Cuarto azul","Empieza por D"]),
+ mk("Gran Vía","Colaboraciones",["🏙️🎶🇪🇸","Con Quevedo","Empieza por G"],"gran via"),
+ mk("Blue jeans","Mafalda Cardenal",["👖💙✨","Es de Belonia","Empieza por B"]),
+ mk("Algo paranormal","Mafalda Cardenal",["👻🔮✨","Es de Belonia","Empieza por A"]),
+ mk("Un lunes más","Mafalda Cardenal",["📅😴☕","Es de Belonia","Empieza por U"]),
+ mk("Las Vegas","Primeros años",["🎰🌵🃏","Es de Spoiler","Empieza por L"]),
+ mk("Mejor que tú","Primeros años",["🏆👀💁‍♀️","Es de Spoiler","Empieza por M"]),
+ mk("Popcorn","Primeros años",["🍿🎬😋","Es de Spoiler","Empieza por P"]),
+ mk("Cristal","Primeros años",["💎🪞✨","Es de Spoiler","Empieza por C"]),
+ mk("Barro y hielo","Primeros años",["🪨🧊🌧️","Es de Spoiler","Empieza por B"]),
+ mk("Estupidez","Colaboraciones",["🤦‍♀️🎸🤝","Es de 11 Razones, con Beret","Empieza por E"]),
+ mk("Si no vas a volver","11 Razones",["🚪🙅‍♀️🔙","Es de 11 Razones","Empieza por S"]),
+ mk("No te has ido y ya te extraño","11 Razones",["🚶‍♂️💭😢","Abre 11 Razones","Empieza por N"]),
+ mk("Alpha09","Alpha",["🅰️0️⃣9️⃣","Es de Alpha","Empieza por A"],"alpha"),
+ mk("Dararí","Alpha",["🎶💃🔥","Es de Alpha","Empieza por D"],"darari"),
+ mk("Ella bailaba","Alpha",["💃🕺🌙","Es de Alpha","Empieza por E"]),
+ mk("Otra noche sin ti","Alpha",["🌃🙅‍♀️❤️","Es de Alpha","Empieza por O"]),
+ mk("Tu foto del DNI","Colaboraciones",["🪪📸🎤","Con Marmi","Empieza por T"],"tu foto del dni"),
+ mk("32 de agosto","Mafalda Cardenal",["3️⃣2️⃣📅☀️","Su primer single, de 2021","Empieza por 3"]),
+ mk("Si tiene que ser será","Mafalda Cardenal",["🤞🔮😌","Es una de sus primeras canciones","Empieza por S"]),
+ mk("Normal","Mafalda Cardenal",["😐🧍‍♀️🙂","Es la pista 4 de Mis notas de voz","Va justo antes de Solo un nombre","Empieza por N"]),
+ mk("Ella era yo","Mafalda Cardenal",["👩🪞💭","Es la pista 6 de Mis notas de voz","Va justo después de Solo un nombre","Empieza por E"]),
+ mk("Mi chico","Mafalda Cardenal",["👦❤️🎸","Es la pista 7 de Mis notas de voz","Empieza por M"]),
+ mk("No hablamos el mismo idioma","Mafalda Cardenal",["🗣️🙉🌍","Es la pista 8 de Mis notas de voz","Va justo antes de Todo es azul","Empieza por N"]),
+ mk("Tie my shoes","Mafalda Cardenal",["👟🎀🚶‍♀️","Es la pista 11 de Mis notas de voz","Su título está en inglés","Empieza por T"]),
+ mk("Para mi mejor amiga","Mafalda Cardenal",["👯‍♀️💌🫶","Es la pista 15 de Mis notas de voz","Va justo antes de Esto iba a ser una canción de amor","Empieza por P"]),
+ mk("¿Qué tiene?","Mafalda Cardenal",["❓😍🤔","Es la pista 3 de Belonia","Su título es una pregunta","Empieza por Q"],"que tiene"),
+ mk("Un segundo","Mafalda Cardenal",["⏱️1️⃣✨","Es la pista 6 de Belonia","Va justo después de Gigantes","Empieza por U"]),
+ mk("Canción de amor","Mafalda Cardenal",["💌🎶❤️","Es de Belonia","Fue uno de los avances del disco","Empieza por C"]),
+ mk("¿Qué significa el amor?","Mafalda Cardenal",["❓❤️🤔","Con Carlos Rivera","Empieza por Q"],"que significa el amor"),
+ mk("6 de febrero","Cuarto azul",["🗓️6️⃣❄️","Es la pista 1 de Cuarto azul","Fue uno de los singles del álbum","Empieza por 6"]),
+ mk("¿Para qué volver?","Colaboraciones",["🔙❓😞","Con Ela Taubert","Es la pista 4 de Cuarto azul","Empieza por P"],"para que volver"),
+ mk("Cuarto azul","Cuarto azul",["🔵🛏️🎨","Da nombre al álbum","Es la pista 5 de Cuarto azul","Empieza por C"]),
+ mk("De 1 beso a 2 besos","Cuarto azul",["1️⃣💋2️⃣","Es la pista 7 de Cuarto azul","Va justo antes de Trankis","Empieza por D"]),
+ mk("Cuando hables con él","Cuarto azul",["🗣️👤💌","Es la pista 10 de Cuarto azul","Es una balada íntima","Empieza por C"]),
+ mk("La chica perfecta","Cuarto azul",["👩‍🎤✨💯","Con Alaska","Cierra Cuarto azul","Empieza por L"]),
+ mk("Perdimos la razón","Primeros años",["🤯💔🧠","Es la pista 7 de Spoiler","Empieza por P"]),
+ mk("Stupid","Primeros años",["🤦‍♀️💭🙄","Es la pista 9 de Spoiler","Su título está en inglés","Empieza por S"]),
+ mk("Hold","Primeros años",["✋🛑🤝","Es la pista 10 de Spoiler","Es la más corta del disco, con 2:21","Empieza por H"]),
+ mk("El Trece","Primeros años",["1️⃣3️⃣🍀","Es la pista 13 de Spoiler","Empieza por E"]),
+ mk("AQYNE","Alpha",["🌅👭🎤","Es la pista 5 de Alpha","Con Danna Paola en el single de octubre de 2023","Empieza por A"]),
+ mk("The Killers","Alpha",["🎸🏜️🔥","Es la pista 8 de Alpha","Su título está en inglés","Empieza por T"]),
+ mk("Si tú la quieres","Colaboraciones",["🎤🇪🇸🤝","Con David Bisbal","Empieza por S"]),
+ mk("Aunque no sea conmigo","Colaboraciones",["🤝💞🙏","Con Evaluna Montaner","Empieza por A"]),
+ mk("Solo si es contigo","Colaboraciones",["👨‍👩‍👧💞🎶","A tres voces, con Alfred García y Ana Guerra","Empieza por S"]),
+ mk("11 Razones","11 Razones",["1️⃣1️⃣📝💔","Da nombre a su segundo álbum","Es la pista 11 de 11","Empieza por 1"],"once razones"),
+ mk("+ (Más)","11 Razones",["➕🎸🤝","Con Cali y El Dandee","Es la pista 8 de 11","Empieza por M"]),
+ mk("- (Menos)","Colaboraciones",["➖🎤🤝","Con Álvaro Díaz y Pole","Es la pista 2 de 11","Empieza por M"]),
+ mk("× (Por)","11 Razones",["✖️🔢","Es la pista 4 de 11","Es el signo de multiplicar","Empieza por P"]),
+ mk("÷ (Dividido)","11 Razones",["➗🔢","Es la pista 6 de 11","Es el signo de dividir","Empieza por D"]),
+ mk("= (Igual)","11 Razones",["🟰🔢","Es la pista 10 de 11","Va justo antes de 11 Razones","Empieza por I"]),
+ mk("Berlín","Singles sueltos",["🧱🇩🇪🚆","Salió en 2021","Es dos veces platino","Empieza por B"],"berlin"),
+ mk("Otra vez","Singles sueltos",["🔁🎶😅","Salió en 2022","Empieza por O"]),
+ mk("Akureyri","Singles sueltos",["🇮🇸🌌❄️","Con Sebastián Yatra","Salió en 2024","Empieza por A"]),
+ mk("Hermosa casualidad","Singles sueltos",["🌹🎲😍","Con Sen Senra","Salió en 2024","Empieza por H"]),
+ mk("4to 23","Singles sueltos",["4️⃣2️⃣3️⃣","Salió en 2024","Empieza por 4"],"cuarto 23"),
+ mk("Llueve sobre mojado","Singles sueltos",["🌧️💦☔","Con Pablo Alborán y Álvaro de Luna","Empieza por L"]),
+ mk("Coldplay","Singles sueltos",["🇬🇧🎸🌈","Con Cali y El Dandee","Empieza por C"]),
+ mk("Las dudas","Singles sueltos",["❓🤔😟","Es de Sebastián Yatra, con Aitana","Empieza por L"]),
+ mk("Luna","Alpha",["🌙✨🐺","Es de Alpha","Empieza por L"]),
+ mk("2 Extraños","Alpha",["2️⃣👥🚶","Es de Alpha","Empieza por 2"],"dos extranos"),
+ mk("24 Rosas","Alpha",["🌹🌹🌹","Es de Alpha","Empieza por 2"],"veinticuatro rosas"),
+ mk("Ni una más","Singles sueltos",["🚫☝️💜","Salió en 2021","Empieza por N"]),
+ mk("Procuro olvidarte","Primeros años",["🧠🚫💭","Es del disco de OT 2017","Empieza por P"]),
+ mk("Con las ganas","Primeros años",["💪😍🔥","Es un dúo con Amaia","Empieza por C"]),
+ mk("No puedo vivir sin ti","Primeros años",["🙏💔😭","Es un dúo con Cepeda","Empieza por N"]),
+ mk("Volaré","Singles sueltos",["🕊️✈️🌤️","Es de la banda sonora de Más allá de la luna","Empieza por V"],"volare"),
+ mk("Like I Can","Singles sueltos",["💃🇬🇧🎤","Con Sam Smith","Empieza por L"]),
+ mk("Mándame un audio","Singles sueltos",["🎙️📱💌","Remix de Fresquito y Mango","Empieza por M"],"mandame un audio remix"),
+ mk("Sálvame","Singles sueltos",["🆘🙏🎸","Con Moderatto","Empieza por S"],"salvame")
+],"Adivina el título con emojis",true);
+
+textGame($("#clues"),[
+ mk("Los Ángeles","Alpha",["Dura unos dos minutos y cuarenta segundos","Salió en marzo de 2023","Fue el primer single de su álbum Alpha","La compuso tras un viaje a una ciudad de California","Esa ciudad da nombre al título","Tiene sonido house y es triple platino en España"]),
+ mk("Las Babys","Alpha",["Dura unos dos minutos y medio","Salió en junio de 2023","Es de su álbum Alpha","Su base viene de un éxito de baile de los 90","La canción original es Saturday Night, de Whigfield","Fue uno de los grandes sonidos del verano de 2023"]),
+ mk("Formentera","Alpha",["Es siete veces platino en España","Salió como single en 2021","Después entró en el álbum Alpha","Es una colaboración con una cantante argentina","Esa cantante es Nicki Nicole","Lleva el nombre de una isla balear"]),
+ mk("Lo malo","Primeros años",["Aitana aún no había publicado su primer álbum de estudio","Salió en 2018","Nació en Operación Triunfo","Se presentó para elegir representante de Eurovisión 2018","Es un dúo con Ana Guerra","Fue número uno y cinco veces disco de platino"]),
+ mk("Nada sale mal","Primeros años",["Su álbum fue número 1 de ventas en España","Es de su álbum debut, Spoiler","Spoiler salió en 2019","El single se anunció en mayo de 2019","Empieza por N"]),
+ mk("Segundo intento","Cuarto azul",["Su álbum es el cuarto de estudio de la cantante","Es de Cuarto azul","Ese álbum salió el 30 de mayo de 2025","Tiene 19 canciones y 7 colaboraciones","Fue uno de los temas que se conocían antes del álbum","Empieza por S"]),
+ mk("Mi amor","Alpha",["Es doble platino en España","Es de Alpha, de 2023","Salió como single en agosto de 2023","Su título se escribe junto y en minúsculas","Es una colaboración con Rels B","Empieza por M"],"miamor"),
+ mk("En el coche","Alpha",["Es doble platino en España","Salió en 2022","Después entró en la lista de canciones de Alpha","Sirvió de puente entre dos etapas de su música","Empieza por E"]),
+ mk("AQYNE","Alpha",["Se escribe todo en mayúsculas","Salió como single en octubre de 2023","Es de Alpha","Es un dúo con Danna Paola","Danna Paola es mexicana"]),
+ mk("11 Razones","11 Razones",["Es el título de su segundo álbum","Salió en 2020","El álbum tiene influencias rockeras","La canción es doble platino","Lleva un número en el título"],"once razones"),
+ mk("Mariposas","Colaboraciones",["Es un dúo con Sangiovanni","Él es un cantante italiano","Tiene una versión en italiano llamada Farfalle","El título es el nombre de unos insectos con alas","Empieza por M"]),
+ mk("Teléfono","Primeros años",["Fue una de sus primeras canciones en solitario","Llegó tras su paso por Operación Triunfo","Estuvo seis semanas en lo más alto de las listas","Es cuatro veces platino","Su vídeo batió récords de visitas en Vevo en 24 horas"]),
+ mk("Sentimiento natural","Cuarto azul",["Es de Cuarto azul","El álbum salió en 2025","Es un dúo con Myke Towers","Myke Towers es de Puerto Rico","Empieza por S"]),
+ mk("Cuando te fuiste","Colaboraciones",["Es de su etapa más rockera","Se grabó en un formato llamado En El Garaje","Es un dúo con Natalia Lacunza","Empieza por C"]),
+ mk("Más de lo que aposté","Colaboraciones",["Salió el 30 de julio de 2020","Es un sencillo que no pertenece a ningún álbum","Es una colaboración con un grupo colombiano","Ese grupo es Morat","Es disco de platino en España"]),
+ mk("Me quedo","Primeros años",["Salió el 28 de junio de 2019","Es de Spoiler","Es doble platino en España","Es un dúo con Lola Indigo","Empieza por M"]),
+ mk("Con la miel en los labios","Primeros años",["Salió el 31 de mayo de 2019","Superó los 340.000 reproducciones en Spotify en 24 horas","Fue el segundo single oficial de Spoiler","Es doble platino","Empieza por C"]),
+ mk("Corazón sin vida","11 Razones",["Salió el 2 de octubre de 2020","Fue uno de los singles de 11 Razones","Alejandro Sanz participó como coautor","Incluye guiños a un clásico llamado Corazón partío","Es un dúo con Sebastián Yatra"]),
+ mk("Tu fan","Mafalda Cardenal",["Se hizo viral en 2023","Triunfó en TikTok","Llegó al número 1 de Los 50 Más Virales de Spotify","La escribió triste tras una ruptura y la olvidó entre sus notas de voz","Pasa de 100 millones de reproducciones en Spotify"]),
+ mk("Vete a la luna","Mafalda Cardenal",["Es de su álbum debut, Mis notas de voz","Es la pista 17 del disco","Salió como avance del álbum","Ella ha hablado con humor de esta canción en entrevistas","Empieza por V"]),
+ mk("Solo un nombre","Mafalda Cardenal",["Es de Mis notas de voz","Es la quinta pista del disco","Fue uno de los avances del álbum","Empieza por S"]),
+ mk("En mi balcón","Mafalda Cardenal",["Es de Mis notas de voz","Es la décima pista del disco","Fue un avance del álbum","Suena en su gira de salas","Empieza por E"]),
+ mk("Esto iba a ser una canción de amor","Mafalda Cardenal",["Es de Mis notas de voz","Es la pista 16","Salió como avance del álbum","Empieza por E"]),
+ mk("No estábamos juntos","Mafalda Cardenal",["Es de Mis notas de voz","Es la pista 12","Salió como single antes del álbum","Empieza por N"]),
+ mk("+ (Más)","11 Razones",["Salió en diciembre de 2019","Es de 11 Razones","Llegó al puesto 2 en España","Es triple platino","Es un dúo con Cali y El Dandee"],"mas","mas mas"),
+ mk("Mon amour","Colaboraciones",["Es una colaboración con Zzoilo","Pasa de 100 millones de reproducciones en Spotify","Su título está en francés","Empieza por M"]),
+ mk("Arde","Primeros años",["Salió en 2018","Nace en Operación Triunfo","Fue su candidata en solitario a Eurovisión 2018","Compite con Lo malo para representar a España","Empieza por A"]),
+ mk("Friend de Semana","Colaboraciones",["Es una colaboración a tres voces","Con Danna Paola y Luísa Sonza","Luísa Sonza es brasileña","Empieza por F"]),
+ mk("Duele un montón despedirme de ti","Colaboraciones",["Es un dúo con Jay Wheeler","Jay Wheeler es de Puerto Rico","Su título habla de una despedida","Empieza por D"]),
+ mk("Hoy es tu cumpleaños","Colaboraciones",["Es un dúo con Danny Ocean","Danny Ocean es venezolano","Su título habla de una fecha especial","Empieza por H"]),
+ mk("La canción que no quiero cantarte","Colaboraciones",["Es un dúo con Amaia","Amaia también salió de Operación Triunfo","Empieza por L"]),
+ mk("Solo si es contigo","Colaboraciones",["Es una colaboración a tres voces","Con Alfred García y Ana Guerra","Los tres salieron de Operación Triunfo","Empieza por S"]),
+ mk("Apaga la luz","Mafalda Cardenal",["Es de su álbum debut, Mis notas de voz","Es la pista 2 de 18","El disco no tiene colaboraciones","Empieza por A"]),
+ mk("Déjame entrar","Mafalda Cardenal",["Es de su álbum debut, Mis notas de voz","Es la pista 3 de 18","El disco no tiene colaboraciones","Empieza por D"]),
+ mk("Todo es azul","Mafalda Cardenal",["Es de su álbum debut, Mis notas de voz","Es la pista 9 de 18","El álbum nació de notas de voz de WhatsApp","Empieza por T"]),
+ mk("Carolina (cuídale mejor que yo)","Mafalda Cardenal",["Es de Mis notas de voz","Es la pista 13 de 18","Va justo después de No estábamos juntos y antes de Venecia","Empieza por C"],"carolina"),
+ mk("Superhumano","Mafalda Cardenal",["Es de Mis notas de voz","Es la pista 18 de 18","Cierra el álbum","Empieza por S"]),
+ mk("Desde que no estás","Mafalda Cardenal",["Es de Belonia, su nueva etapa","Salió después de Mis notas de voz","Empieza por D"]),
+ mk("Creo que te quiero","Mafalda Cardenal",["Es de Belonia, su nueva etapa","Salió después de Mis notas de voz","Empieza por C"]),
+ mk("Vas a quedarte","Primeros años",["Es del EP Tráiler","El EP salió en noviembre de 2018","Fue su segundo single de ese EP","Tiene más de 100 millones de reproducciones","Empieza por V"]),
+ mk("Venecia","Mafalda Cardenal",["Es de Mis notas de voz","Es la pista 14 de 18","El disco no tiene colaboraciones","Empieza por V"]),
+ mk("Mi chico","Mafalda Cardenal",["Es de Mis notas de voz","Es la pista 7 de 18","El disco lo compuso y escribió ella entera","Empieza por M"]),
+ mk("Normal","Mafalda Cardenal",["Es de Mis notas de voz","Es la pista 4 de 18","Va justo antes de Solo un nombre","Empieza por N"]),
+ mk("Ella era yo","Mafalda Cardenal",["Es de Mis notas de voz","Es la pista 6 de 18","Va justo después de Solo un nombre","Empieza por E"]),
+ mk("No hablamos el mismo idioma","Mafalda Cardenal",["Es de Mis notas de voz","Es la pista 8 de 18","Va justo antes de Todo es azul","Empieza por N"]),
+ mk("Tie my shoes","Mafalda Cardenal",["Es de Mis notas de voz","Su título está en inglés","Es la pista 11 de 18","Empieza por T"]),
+ mk("Para mi mejor amiga","Mafalda Cardenal",["Es de Mis notas de voz","Es la pista 15 de 18","Va justo antes de Esto iba a ser una canción de amor","Empieza por P"]),
+ mk("6 de febrero","Cuarto azul",["Es de Cuarto azul","Es la pista 1 del álbum","Fue uno de los singles que adelantaron el disco","Dura menos de tres minutos","Su título es una fecha"]),
+ mk("Superestrella","Cuarto azul",["Es de Cuarto azul","Su título se desveló el 14 de mayo de 2025 con la lista de 19 canciones","Su título habla de alguien muy famoso","Empieza por S"]),
+ mk("Conexión psíquica","Cuarto azul",["Es de Cuarto azul","La prensa la cita entre las canciones destacadas del disco","Su título habla de telepatía","Empieza por C"],"conexion psiquica"),
+ mk("Música en el cielo","Cuarto azul",["Es de Cuarto azul","La presentó en una listening party en Madrid","Es un recuerdo a su abuelo","Empieza por M"]),
+ mk("En el centro de la cama","Cuarto azul",["Es de Cuarto azul","La cantó en su gira Metamorfosis Season","La prensa la describe como una de las canciones más emotivas del show","Empieza por E"]),
+ mk("LIA","Cuarto azul",["Es de Cuarto azul","Es la pista 18","Va justo antes de La chica perfecta","Tiene solo tres letras"]),
+ mk("Cuarto azul","Cuarto azul",["Da nombre al álbum","Es la pista 5 de 19","Va justo después de ¿Para qué volver?","Empieza por C"]),
+ mk("La chica perfecta","Cuarto azul",["Es la última pista de Cuarto azul","Es una colaboración con Alaska","Alaska es la cantante de Fangoria","Empieza por L"]),
+ mk("Nada mal","Mafalda Cardenal",["Es de Belonia, su segundo álbum","Es la pista 1 de 12","Belonia salió el 16 de octubre de 2026","Empieza por N"]),
+ mk("La historia de nosotros","Mafalda Cardenal",["Es de Belonia, su segundo álbum","Es la pista 2 de 12","Va justo después de Nada mal","Empieza por L"]),
+ mk("¿Qué tiene?","Mafalda Cardenal",["Es de Belonia, su segundo álbum","Es la pista 3 de 12","Su título es una pregunta","Empieza por Q"],"que tiene"),
+ mk("Gigantes","Mafalda Cardenal",["Es de Belonia, su segundo álbum","Fue uno de los avances del disco","Belonia tiene 12 pistas","Empieza por G"]),
+ mk("Canción de amor","Mafalda Cardenal",["Es de Belonia, su segundo álbum","Fue uno de los avances del disco","Belonia salió en octubre de 2026","Empieza por C"]),
+ mk("¿Qué significa el amor?","Mafalda Cardenal",["Es una colaboración con Carlos Rivera","Carlos Rivera es mexicano","Su título es una pregunta","Empieza por Q"],"que significa el amor"),
+ mk("Desde que ya no hablamos","Cuarto azul",["Es de Cuarto azul","Es la pista 6 de 19","Aitana adelantó un fragmento en Instagram antes del lanzamiento","Va justo después del tema que da nombre al álbum","Empieza por D"]),
+ mk("De 1 beso a 2 besos","Cuarto azul",["Es de Cuarto azul","Es la pista 7 de 19","Va justo antes de Trankis","Su título lleva dos números","Empieza por D"]),
+ mk("Trankis","Cuarto azul",["Es de Cuarto azul","Es la pista 8 de 19","Va justo antes de Música en el cielo","Empieza por T"]),
+ mk("Ex ex ex","Cuarto azul",["Es de Cuarto azul","Es la pista 16 de 19","Fue una de las cuatro canciones que adelantó el 22 de mayo de 2025","Su título repite una palabra tres veces","Empieza por E"]),
+ mk("Gran Vía","Colaboraciones",["Es una colaboración con Quevedo","Estuvo tres semanas en el número 1 de las listas de España","Quevedo es canario","Lleva el nombre de una calle muy famosa de Madrid","Empieza por G"],"gran via"),
+ mk("Un lunes más","Mafalda Cardenal",["Es de Belonia, su segundo álbum","Es la pista 4 de 12","Va justo después de ¿Qué tiene?","Empieza por U"]),
+ mk("Un segundo","Mafalda Cardenal",["Es de Belonia, su segundo álbum","Es la pista 6 de 12","Va justo después de Gigantes","Empieza por U"]),
+ mk("Blue jeans","Mafalda Cardenal",["Es de Belonia, su segundo álbum","Es la pista 7 de 12","Su título está en inglés","Empieza por B"]),
+ mk("Algo paranormal","Mafalda Cardenal",["Es de Belonia, su segundo álbum","Es la pista 10 de 12","Va justo antes de Canción de amor","Empieza por A"]),
+ mk("Las Vegas","Primeros años",["Es de Spoiler, su primer álbum","Es la pista 5 del disco","Va justo antes de Con la miel en los labios","Su título es una ciudad de Nevada","Empieza por L"]),
+ mk("Mejor que tú","Primeros años",["Es de Spoiler, su primer álbum","Es la pista 8 del disco","Va justo después de Perdimos la razón","Empieza por M"]),
+ mk("Stupid","Primeros años",["Es de Spoiler, su primer álbum","Es la pista 9 del disco","Su título está en inglés","Va justo antes de Hold","Empieza por S"]),
+ mk("Hold","Primeros años",["Es de Spoiler, su primer álbum","Es la pista 10 del disco","Es la más corta de la lista del disco, con 2:21","Su título está en inglés","Empieza por H"]),
+ mk("Cristal","Primeros años",["Es de Spoiler, su primer álbum","Es la pista 11 del disco","Va justo antes de Popcorn","Empieza por C"]),
+ mk("Popcorn","Primeros años",["Es de Spoiler, su primer álbum","Es la pista 12 del disco","Su título es un snack típico del cine","Empieza por P"]),
+ mk("El Trece","Primeros años",["Es de Spoiler, su primer álbum","Es la pista 13 del disco","Va justo antes de Barro y hielo","Empieza por E"]),
+ mk("Barro y hielo","Primeros años",["Es de Spoiler, su primer álbum","Es la pista 14 del disco","Va justo después de El Trece","Empieza por B"]),
+ mk("No te has ido y ya te extraño","11 Razones",["Es de 11 Razones, su segundo álbum","Abre el disco","El álbum cuenta las razones para dejar a una pareja ficticia","Empieza por N"]),
+ mk("Estupidez","Colaboraciones",["Es de 11 Razones","Es la pista 3 de 11","Es un dúo con Beret","Beret es un cantante y compositor español","Empieza por E"]),
+ mk("Si no vas a volver","11 Razones",["Es de 11 Razones","Es la pista 9 de 11","Va justo después de + (Más)","Empieza por S"]),
+ mk("× (Por)","11 Razones",["Es de 11 Razones","Es la pista 4 de 11","Su título es un símbolo matemático","Aitana ordenó símbolos matemáticos para pensar la lista del disco","Es el signo de multiplicar"],"por","x","x por"),
+ mk("÷ (Dividido)","11 Razones",["Es de 11 Razones","Es la pista 6 de 11","Va justo después de Corazón sin vida","Su título es un símbolo matemático","Es el signo de dividir"],"dividido","division"),
+ mk("= (Igual)","11 Razones",["Es de 11 Razones","Es la pista 10 de 11","Va justo antes de la canción que da título al álbum","Su título es un símbolo matemático","Es el signo de igualdad"],"igual"),
+ mk("- (Menos)","Colaboraciones",["Es de 11 Razones","Es la pista 2 de 11","Es una colaboración con Álvaro Díaz y Pole","Su título es un símbolo matemático","Es el signo de restar"],"menos"),
+ mk("Alpha09","Alpha",["Es de Alpha","Es la pista 1 del álbum","Aparece en el tráiler con el que Aitana anunció la nueva era, en marzo de 2023","Su título lleva un número","Empieza por A"],"alpha"),
+ mk("Dararí","Alpha",["Es de Alpha","Es la pista 4 de 15","Va justo después de Las Babys","Empieza por D"],"darari"),
+ mk("Ella bailaba","Alpha",["Es de Alpha","Es la pista 6 de 15","Va justo después de AQYNE","Empieza por E"]),
+ mk("Otra noche sin ti","Alpha",["Es de Alpha","Es la pista 7 de 15","Va justo antes de The Killers","Empieza por O"]),
+ mk("The Killers","Alpha",["Es de Alpha","Es la pista 8 de 15","Su título está en inglés","Empieza por T"]),
+ mk("Tu foto del DNI","Colaboraciones",["Es una colaboración con Marmi","Suena en los conciertos de Aitana junto a Mon amour","Su título habla de un documento de identidad","Empieza por T"],"tu foto del dni"),
+ mk("32 de agosto","Mafalda Cardenal",["Fue el primer single de Mafalda Cardenal","Salió en 2021","Su título es una fecha que no existe","Empieza por 3"]),
+ mk("Si tiene que ser será","Mafalda Cardenal",["Es una de sus primeras canciones, anterior a Tu fan","La prensa la cita junto a Pa que me cantes en el coche","Empieza por S"]),
+ mk("Berlín","Singles sueltos",["Salió en 2021","Es dos veces platino en España","Su título es una capital europea","Empieza por B"],"berlin"),
+ mk("Otra vez","Singles sueltos",["Salió en 2022","Es disco de oro","Su título pide repetir algo","Empieza por O"]),
+ mk("Akureyri","Singles sueltos",["Es un dúo con Sebastián Yatra","Salió en 2024","Llegó al puesto 8 en España","Su título es una ciudad de Islandia","Empieza por A"]),
+ mk("Hermosa casualidad","Singles sueltos",["Es un dúo con Sen Senra","Salió en 2024","Es disco de oro","Empieza por H"]),
+ mk("4to 23","Singles sueltos",["Salió en 2024","Llegó al puesto 15 en España","Su título lleva números","Empieza por 4"],"cuarto 23"),
+ mk("Llueve sobre mojado","Singles sueltos",["Es un tema con Pablo Alborán y Álvaro de Luna","Salió en 2021","Es disco de platino en España","Empieza por L"]),
+ mk("Coldplay","Singles sueltos",["Es una colaboración con Cali y El Dandee","Salió en 2021","Su título es el nombre de una banda británica","Empieza por C"]),
+ mk("Las dudas","Singles sueltos",["Es de Sebastián Yatra, con Aitana","Salió en 2022","Es disco de oro","Empieza por L"]),
+ mk("Luna","Alpha",["Es de Alpha","Salió en 2023","Aitana la cantó en una sesión de Amazon Music en octubre de 2023","Su título es un satélite","Empieza por L"]),
+ mk("2 Extraños","Alpha",["Es de Alpha","Aitana la cantó en Amazon Music el 12 de octubre de 2023","Su título lleva un número","Empieza por 2"],"dos extranos"),
+ mk("24 Rosas","Alpha",["Es de Alpha","Es disco de oro","Su título lleva un número y unas flores","Empieza por 2"],"veinticuatro rosas"),
+ mk("Ni una más","Singles sueltos",["Salió en 2021","Es disco de oro","Empieza por N"]),
+ mk("Procuro olvidarte","Primeros años",["Es del disco de Operación Triunfo 2017","Salió en 2018","Empieza por P"]),
+ mk("Con las ganas","Primeros años",["Es un dúo con Amaia","Es del disco de Operación Triunfo 2017","Es disco de oro","Empieza por C"]),
+ mk("No puedo vivir sin ti","Primeros años",["Es un dúo con Cepeda","Es del disco de Operación Triunfo 2017","Es disco de oro","Empieza por N"]),
+ mk("Volaré","Singles sueltos",["Es de la banda sonora de Más allá de la luna","Salió en 2020","Su título es un verbo en futuro","Empieza por V"],"volare"),
+ mk("Like I Can","Singles sueltos",["Es una versión con Sam Smith","Salió en la edición del décimo aniversario de In The Lonely Hour","Aitana aparece como invitada en 2024","Su título está en inglés","Empieza por L"]),
+ mk("Mándame un audio","Singles sueltos",["Es un remix de Fresquito y Mango, con Aitana","Salió en 2021","Es disco de oro","Empieza por M"],"mandame un audio remix"),
+ mk("Sálvame","Singles sueltos",["Es una colaboración con Moderatto","Es del álbum Rockea bien duro","Su título es una petición de ayuda","Empieza por S"],"salvame")
+],"Cuantas menos pistas uses, más puntos");
+
+/* ---------- Opción múltiple (Álbum y Dúos) ---------- */
+function mc(root,items,q,ans,pool,extra,cat){
+  const g={s:0,n:0,it:null,o:[],done:false};
+  root.innerHTML=`<div class="top"><span class="nn"></span><span class="score">Puntos: <span class="ss">0</span></span></div>
+  <p class="qq" style="margin:0 0 10px;font-weight:600"></p><div class="opts"></div>
+  <p class="msg" role="status"></p><div class="row"><button class="btn alt hh">Pista: quitar dos opciones</button><button class="btn alt nx" hidden>Siguiente</button></div><p class="hint">2 puntos sin pista y 1 con pista.</p>`;
+  const ob=$(".opts",root),mg=$(".msg",root);
+  function nw(){
+    g.done=false;g.h=false;$(".hh",root).disabled=false;
+    const L=items.filter(s=>okF(s[0],cat?cat(s):G.cat));
+    if(!L.length){g.it=null;$(".qq",root).textContent="No hay canciones de esta categoría en este juego. Cambia el filtro.";ob.innerHTML="";mg.textContent="";$(".nx",root).hidden=true;$(".hh",root).disabled=true;return}
+    g.n++;g.it=pick(L);const a=ans(g.it);
+    g.o=sh([a,...sh((typeof pool==="function"?pool(g.it):pool).filter(x=>x!==a)).slice(0,3)]);
+    $(".nn",root).textContent="Pregunta "+g.n;$(".qq",root).innerHTML=q(g.it);
+    ob.innerHTML=g.o.map((x,i)=>`<button data-i="${i}">${x}</button>`).join("");
+    mg.textContent="";mg.className="msg";$(".nx",root).hidden=true;
+  }
+  ob.addEventListener("click",e=>{
+    const b=e.target.closest("button");if(!b||g.done)return;
+    g.done=true;const a=ans(g.it),ok=g.o[+b.dataset.i]===a;
+    [...ob.children].forEach((c,i)=>{if(g.o[i]===a)c.classList.add("good")});
+    if(ok){g.s+=g.h?1:2;mg.textContent="¡Correcto! "+extra(g.it);mg.className="msg ok"}
+    else{b.classList.add("bad");mg.textContent=`No. Es «${a}». ${extra(g.it)}`;mg.className="msg bad"}
+    $(".ss",root).textContent=g.s;$(".nx",root).hidden=false;$(".hh",root).disabled=true;
+  });
+  $(".hh",root).onclick=()=>{if(g.done||g.h)return;g.h=true;$(".hh",root).disabled=true;const a=ans(g.it);let rm=0;[...ob.children].forEach((c,i)=>{if(rm<2&&g.o[i]!==a){c.disabled=true;c.style.opacity=".3";rm++}})};
+  $(".nx",root).onclick=nw;HOOKS.push(nw);nw();
+}
+const AL=["Spoiler","11 Razones","Alpha","Cuarto azul","Tráiler (EP)"],ALY={"Spoiler":2019,"11 Razones":2020,"Alpha":2023,"Cuarto azul":2025,"Tráiler (EP)":2018};
+const ALS=[["Nada sale mal","Spoiler"],["Con la miel en los labios","Spoiler"],["11 Razones","11 Razones"],["Los Ángeles","Alpha"],["Las Babys","Alpha"],["Dararí","Alpha"],["AQYNE","Alpha"],["Formentera","Alpha"],["En el coche","Alpha"],["Mi amor","Alpha"],["Ella bailaba","Alpha"],["The Killers","Alpha"],["Segundo intento","Cuarto azul"],["Sentimiento natural","Cuarto azul"],["+ (Más)","11 Razones"],["Corazón sin vida","11 Razones"],["Me quedo","Spoiler"],["Perdimos la razón","Spoiler"],["Cuando te fuiste","11 Razones"],["Estupidez","11 Razones"],["- (Menos)","11 Razones"],["6 de febrero","Cuarto azul"],["Superestrella","Cuarto azul"],["Música en el cielo","Cuarto azul"],["En el centro de la cama","Cuarto azul"],["Conexión psíquica","Cuarto azul"],["LIA","Cuarto azul"],["La chica perfecta","Cuarto azul"],["Duele un montón despedirme de ti","Cuarto azul"],["¿Para qué volver?","Cuarto azul"]];
+const MT=[["Apaga la luz",2],["Déjame entrar",3],["Normal",4],["Solo un nombre",5],["Ella era yo",6],["Mi chico",7],["No hablamos el mismo idioma",8],["Todo es azul",9],["En mi balcón",10],["No estábamos juntos",12],["Carolina (cuídale mejor que yo)",13],["Venecia",14],["Esto iba a ser una canción de amor",16],["Vete a la luna",17],["Superhumano",18],["Mis notas de voz (intro)",1],["Tie my shoes",11],["Para mi mejor amiga",15]];
+MT.forEach(([t,n])=>ALS.push([t,String(n),"M"]));
+const CT=[["6 de febrero",1],["Duele un montón despedirme de ti",2],["Segundo intento",3],["¿Para qué volver?",4],["Cuarto azul",5],["Desde que ya no hablamos",6],["De 1 beso a 2 besos",7],["Trankis",8],["Música en el cielo",9],["Cuando hables con él",10],["Luz de la mañana (interlude)",11],["En el centro de la cama",12],["Sentimiento natural",13],["Conexión psíquica",14],["Superestrella",15],["Ex ex ex",16],["Hoy es tu cumpleaños",17],["LIA",18],["La chica perfecta",19]];
+const BT=[["Nada mal",1],["La historia de nosotros",2],["¿Qué tiene?",3],["Un lunes más",4],["Gigantes",5],["Un segundo",6],["Blue jeans",7],["Desde que no estás",8],["Creo que te quiero",9],["Algo paranormal",10],["Canción de amor",11],["Belonia",12]];
+CT.forEach(([t,n])=>ALS.push([t,String(n),"C"]));
+BT.forEach(([t,n])=>ALS.push([t,String(n),"B"]));
+const ST=[["Nada sale mal",1],["Teléfono",2],["Me quedo",3],["Vas a quedarte",4],["Las Vegas",5],["Con la miel en los labios",6],["Perdimos la razón",7],["Mejor que tú",8],["Stupid",9],["Hold",10],["Cristal",11],["Popcorn",12],["El Trece",13],["Barro y hielo",14]];
+const RT=[["No te has ido y ya te extraño",1],["- (Menos)",2],["Estupidez",3],["× (Por)",4],["Corazón sin vida",5],["÷ (Dividido)",6],["Cuando te fuiste",7],["+ (Más)",8],["Si no vas a volver",9],["= (Igual)",10],["11 Razones",11]];
+ST.forEach(([t,n])=>ALS.push([t,String(n),"S"]));
+RT.forEach(([t,n])=>ALS.push([t,String(n),"R"]));
+const AT=[["Alpha09",1],["Los Ángeles",2],["Las Babys",3],["Dararí",4],["AQYNE",5],["Ella bailaba",6],["Otra noche sin ti",7],["The Killers",8]];
+AT.forEach(([t,n])=>ALS.push([t,String(n),"A"]));
+const PIST={M:["Mis notas de voz","Mafalda Cardenal",18,1,"Mafalda Cardenal"],C:["Cuarto azul","Aitana",19,1,"Cuarto azul"],B:["Belonia","Mafalda Cardenal",12,1,"Mafalda Cardenal"],S:["Spoiler","Aitana",14,0,"Primeros años"],R:["11 Razones","Aitana",11,1,"11 Razones"],A:["Alpha","Aitana",15,1,"Alpha"]};
+const pTot=(s,P)=>P[3]?` de ${P[2]}`:"";
+mc($("#alb"),ALS,s=>PIST[s[2]]?`¿Qué número de pista es «<b>${s[0]}</b>» en <i>${PIST[s[2]][0]}</i>, de ${PIST[s[2]][1]}?`:`¿En qué álbum o EP de Aitana está «<b>${s[0]}</b>»?`,s=>s[1],s=>PIST[s[2]]?Array.from({length:PIST[s[2]][2]},(_,i)=>String(i+1)):AL,s=>PIST[s[2]]?`Es la pista ${s[1]}${pTot(s,PIST[s[2]])}.`:`${s[1]} salió en ${ALY[s[1]]}.`,s=>PIST[s[2]]?PIST[s[2]][4]:ALC[s[1]]);
+const CO=[["Lo malo","Ana Guerra"],["Formentera","Nicki Nicole"],["Mi amor","Rels B"],["AQYNE","Danna Paola"],["Mariposas","Sangiovanni"],["Cuando te fuiste","Natalia Lacunza"],["Corazón sin vida","Sebastián Yatra"],["Quieres","Emilia y Ptazeta"],["Presiento","Morat"],["Sentimiento natural","Myke Towers"],["Más de lo que aposté","Morat"],["Enemigos","Reik"],["Me quedo","Lola Indigo"],["Si tú la quieres","David Bisbal"],["+ (Más)","Cali y El Dandee"],["Mon amour","Zzoilo"],["Aunque no sea conmigo","Evaluna Montaner"],["La chica perfecta","Fangoria"],["- (Menos)","Álvaro Díaz y Pole"],["¿Para qué volver?","Ela Taubert"],["Gran Vía","Quevedo"],["Estupidez","Beret"],["Tu foto del DNI","Marmi"],["Akureyri","Sebastián Yatra"],["Hermosa casualidad","Sen Senra"],["Llueve sobre mojado","Pablo Alborán y Álvaro de Luna"],["Coldplay","Cali y El Dandee"],["Las dudas","Sebastián Yatra"],["Like I Can","Sam Smith"],["Mándame un audio","Fresquito y Mango"],["Sálvame","Moderatto"],["Con las ganas","Amaia"],["No puedo vivir sin ti","Cepeda"],["Ex ex ex","Kenia OS"],["Trankis","Barry B"],["Presiento","Morat"],["Friend de Semana","Danna Paola y Luísa Sonza"],["Duele un montón despedirme de ti","Jay Wheeler"],["Hoy es tu cumpleaños","Danny Ocean"],["La canción que no quiero cantarte","Amaia"],["Solo si es contigo","Alfred García y Ana Guerra"]];
+mc($("#col"),CO,s=>`¿Con quién canta Aitana «<b>${s[0]}</b>»?`,s=>s[1],[...new Set(CO.map(x=>x[1]))],s=>`Dúo con ${s[1]}.`,s=>CATOF(s[0])||"Colaboraciones");
+
+/* ---------- Época: ¿cuál salió primero? ---------- */
+const E=[["Lo malo","Single",2018],["Nada sale mal","Single",2019],["Spoiler","Álbum",2019],["Más de lo que aposté","Single",2020],["11 Razones","Álbum",2020],["Formentera","Single",2021],["En el coche","Single",2022],["Los Ángeles","Single",2023],["Mi amor","Single",2023],["Alpha","Álbum",2023],["Cuarto azul","Álbum",2025],["Me quedo","Single",2019],["+ (Más)","Single",2019],["Enemigos","Single",2020],["Corazón sin vida","Single",2020],["Tu fan","Single de Mafalda Cardenal",2023],["Mis notas de voz","Álbum de Mafalda Cardenal",2025],["Presiento","Single",2019],["Si tú la quieres","Single",2020],["Tu foto del DNI","Single",2020],["Berlín","Single",2021],["Mariposas","Single",2022],["Akureyri","Single",2024],["Gran Vía","Single",2024],["Segundo intento","Single",2025]];
+const Q={s:0,b:0,p:null,done:false};
+$("#era").innerHTML=`<div class="top"><span>Récord: <b id="qb">0</b></span><span class="score">Racha: <span id="qs">0</span></span></div>
+<p style="margin:0 0 10px;font-weight:600">¿Cuál de estos dos salió antes?</p>
+<div class="opts" id="qo"></div><p class="msg" id="qm" role="status"></p>
+<div class="row"><button class="btn alt" id="qh">Pista: ver un año</button><button class="btn alt" id="qn" hidden>Siguiente pareja</button></div>
+<p class="hint">Cada acierto suma a tu racha. Si fallas, vuelve a cero.</p>`;
+function qNew(){
+  Q.done=false;$("#qh").disabled=false;
+  const L=E.filter(s=>okF(s[0],CATOF(s[0])));
+  if(new Set(L.map(s=>s[2])).size<2){$("#qo").innerHTML="";$("#qm").textContent="En esta categoría no hay dos épocas distintas. Cambia el filtro.";$("#qm").className="msg bad";$("#qn").hidden=true;$("#qh").disabled=true;Q.done=true;return}
+  let a,b;do{a=pick(L);b=pick(L)}while(a[2]===b[2]);Q.p=[a,b];
+  $("#qo").innerHTML=Q.p.map((s,i)=>`<button data-i="${i}">${s[0]}<br><small>${s[1]}</small></button>`).join("");
+  $("#qm").textContent="";$("#qm").className="msg";$("#qn").hidden=true;
+}
+$("#qo").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b||Q.done)return;
+  Q.done=true;const i=+b.dataset.i,ok=Q.p[i][2]<Q.p[1-i][2],bs=$("#qo").children;
+  for(let k=0;k<2;k++)if(!bs[k].querySelector("b"))bs[k].insertAdjacentHTML("beforeend",`<br><b>${Q.p[k][2]}</b>`);
+  const f=Q.p[0][2]<Q.p[1][2]?0:1;bs[f].classList.add("good");if(!ok)bs[i].classList.add("bad");
+  const m=$("#qm");
+  if(ok){Q.s++;Q.b=Math.max(Q.b,Q.s);m.textContent="¡Correcto!";m.className="msg ok"}
+  else{Q.s=0;m.textContent=`No. Salió antes «${Q.p[f][0]}».`;m.className="msg bad"}
+  $("#qs").textContent=Q.s;$("#qb").textContent=Q.b;$("#qn").hidden=false;$("#qh").disabled=true;
+});
+$("#qh").onclick=()=>{if(Q.done)return;const k=Math.floor(Math.random()*2);$("#qo").children[k].insertAdjacentHTML("beforeend",`<br><b>${Q.p[k][2]}</b>`);$("#qh").disabled=true};
+$("#qn").onclick=qNew;qNew();HOOKS.push(qNew);
+
+/* ---------- Revuelto: ordena las letras ---------- */
+const RV=[["Los Ángeles","Primer single de Alpha"],["Las Babys","Reinterpreta un éxito de los 90"],["Formentera","Con Nicki Nicole"],["Lo malo","Dúo con Ana Guerra"],["Nada sale mal","Del álbum Spoiler"],["Mariposas","Con Sangiovanni"],["Segundo intento","De Cuarto azul"],["Mi amor","Con Rels B"],["Dararí","De Alpha"],["Cuando te fuiste","Con Natalia Lacunza"],["Corazón sin vida","Con Sebastián Yatra"],["Quieres","Con Emilia y Ptazeta"],["Teléfono","Una de sus primeras canciones en solitario"],["En el coche","Single de 2022"],["Sentimiento natural","Con Myke Towers"],["Presiento","Con Morat"],["AQYNE","Con Danna Paola"],["Vas a quedarte","Del EP Tráiler"],["Con la miel en los labios","Del álbum Spoiler"],["Me quedo","Con Lola Indigo"],["Más de lo que aposté","Con Morat"],["Enemigos","Con Reik"],["Mon amour","Con Zzoilo"],["Tu fan","De Mafalda Cardenal, viral en TikTok"],["Vete a la luna","De Mafalda Cardenal"],["Solo un nombre","De Mafalda Cardenal"],["En mi balcón","De Mafalda Cardenal"],["No estábamos juntos","De Mafalda Cardenal"],["Superhumano","De Mafalda Cardenal"],["Venecia","De Mafalda Cardenal"],["Arde","Candidata en solitario a Eurovisión 2018"],["Friend de Semana","Con Danna Paola y Luísa Sonza"],["Duele un montón despedirme de ti","Con Jay Wheeler"],["Hoy es tu cumpleaños","Con Danny Ocean"],["La canción que no quiero cantarte","Con Amaia"],["Apaga la luz","De Mafalda Cardenal"],["Déjame entrar","De Mafalda Cardenal"],["Todo es azul","De Mafalda Cardenal"],["Normal","De Mafalda Cardenal"],["Mi chico","De Mafalda Cardenal"],["Desde que no estás","De su etapa Belonia"],["Creo que te quiero","De su etapa Belonia"],["Canción de amor","De su etapa Belonia"],["Gigantes","De su etapa Belonia"],["Ella bailaba","De Alpha"],["The Killers","De Alpha"],["Perdimos la razón","Del álbum Spoiler"],["Si tú la quieres","Con David Bisbal"],["Aunque no sea conmigo","Con Evaluna Montaner"],["La chica perfecta","Con Fangoria"],["¿Para qué volver?","Con Ela Taubert"],["Solo si es contigo","Con Alfred García y Ana Guerra"],["Ella era yo","De Mafalda Cardenal"],["No hablamos el mismo idioma","De Mafalda Cardenal"],["Tie my shoes","De Mafalda Cardenal"],["Para mi mejor amiga","De Mafalda Cardenal"],["Cuando hables con él","De Aitana"],["Oasis","De Aitana"],["6 de febrero","De Cuarto azul"],["Superestrella","De Cuarto azul"],["Conexión psíquica","De Cuarto azul"],["Música en el cielo","De Cuarto azul"],["En el centro de la cama","De Cuarto azul"],["Nada mal","De Belonia"],["La historia de nosotros","De Belonia"],["¿Qué tiene?","De Belonia"],["Trankis","De Cuarto azul"],["Ex ex ex","De Cuarto azul"],["Desde que ya no hablamos","De Cuarto azul"],["Gran Vía","Con Quevedo"],["Blue jeans","De Belonia"],["Un lunes más","De Belonia"],["Algo paranormal","De Belonia"],["Un segundo","De Belonia"],["Las Vegas","Del álbum Spoiler"],["Mejor que tú","Del álbum Spoiler"],["Popcorn","Del álbum Spoiler"],["Cristal","Del álbum Spoiler"],["Barro y hielo","Del álbum Spoiler"],["Estupidez","Con Beret"],["Si no vas a volver","De 11 Razones"],["No te has ido y ya te extraño","De 11 Razones"],["Otra noche sin ti","De Alpha"],["Tu foto del DNI","Con Marmi"],["32 de agosto","Primer single de Mafalda Cardenal"],["Si tiene que ser será","De Mafalda Cardenal"],["Dararí","De Alpha"],["Berlín","Single de 2021"],["Otra vez","Single de 2022"],["Akureyri","Con Sebastián Yatra"],["Hermosa casualidad","Con Sen Senra"],["Llueve sobre mojado","Con Pablo Alborán"],["Coldplay","Con Cali y El Dandee"],["Las dudas","Con Sebastián Yatra"],["Luna","De Alpha"],["Procuro olvidarte","De Operación Triunfo 2017"],["Con las ganas","Con Amaia"],["Volaré","De Más allá de la luna"],["Mándame un audio","Remix de Fresquito y Mango"],["Sálvame","Con Moderatto"]];
+const R={it:null,hint:false,done:false,s:0};
+$("#rev").innerHTML=`<div class="top"><span>Ordena las letras del título</span><span class="score">Puntos: <span id="rs">0</span></span></div>
+<p id="rw" style="font:800 1.7rem/1.4 'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:.1em;margin:0 0 14px;text-align:center;overflow-wrap:anywhere"></p>
+<div class="row"><input type="text" id="ri" placeholder="Título de la canción" aria-label="Tu respuesta" autocomplete="off"><button class="btn" id="rok">Probar</button></div>
+<div class="row"><button class="btn alt" id="rh">Ver pista</button><button class="btn alt" id="rsk">Saltar</button></div>
+<p class="msg" id="rm" role="status"></p>
+<p class="hint">Sin pista ganas 3 puntos; con una pista, 2; con dos, 1.</p>`;
+const scr=t=>t.split(" ").map(w=>{let s;do{s=sh(w.split("")).join("")}while(s===w&&w.length>2);
+  return `<span style="display:inline-block;margin:0 .35em">${s.toUpperCase()}</span>`}).join("");
+function rNew(){
+  const prev=R.it,L=RV.filter(s=>okF(s[0],CATOF(s[0])));
+  if(!L.length){$("#rw").textContent="—";$("#rm").textContent="No hay canciones de esta categoría aquí. Cambia el filtro.";$("#rm").className="msg bad";R.done=true;return}
+  do{R.it=pick(L)}while(R.it===prev&&L.length>1);R.lvl=0;R.done=false;
+  $("#rw").innerHTML=scr(R.it[0]);$("#ri").value="";$("#ri").disabled=false;$("#rh").disabled=false;
+  $("#rok").textContent="Probar";$("#rm").textContent="";$("#rm").className="msg";
+}
+function rEnd(t,c){R.done=true;$("#rm").textContent=t;$("#rm").className="msg "+c;$("#ri").disabled=true;$("#rh").disabled=true;$("#rok").textContent="Siguiente"}
+function rCheck(){
+  if(R.done){rNew();return}
+  const a=norm($("#ri").value).replace(/ /g,"");if(!a)return;
+  if(a===norm(R.it[0]).replace(/ /g,"")){const p=Math.max(1,3-R.lvl);R.s+=p;$("#rs").textContent=R.s;rEnd(`¡Sí, es «${R.it[0]}»! +${p} puntos`,"ok")}
+  else{const n=near(norm($("#ri").value),[norm(R.it[0])]);$("#rm").textContent=n?NEAR[n]:"Todavía no. Prueba otra vez o pide la pista.";$("#rm").className="msg "+(n?"warm":"bad")}
+}
+$("#rok").onclick=rCheck;
+$("#ri").addEventListener("keydown",e=>{if(e.key==="Enter")rCheck()});
+$("#rh").onclick=()=>{R.lvl++;const t=R.it[0];$("#rm").textContent=R.lvl===1?"Pista: "+R.it[1]:`Empieza por «${t[0].toUpperCase()}» y tiene ${t.replace(/ /g,"").length} letras.`;$("#rm").className="msg";if(R.lvl>=2)$("#rh").disabled=true};
+$("#rsk").onclick=()=>{if(R.done)rNew();else rEnd("Era: "+R.it[0],"bad")};
+rNew();HOOKS.push(rNew);
+
+/* ---------- Artista: ¿Aitana o Mafalda? ---------- */
+const AR=[["Los Ángeles","A"],["Las Babys","A"],["Formentera","A"],["Lo malo","A"],["Nada sale mal","A"],["Vas a quedarte","A"],["Con la miel en los labios","A"],["Segundo intento","A"],["Enemigos","A"],["Más de lo que aposté","A"],["Tu fan","M"],["Vete a la luna","M"],["Solo un nombre","M"],["En mi balcón","M"],["No estábamos juntos","M"],["Esto iba a ser una canción de amor","M"],["Pa que me cantes en el coche","M"],["A ella la llevas a París","M"],["Venecia","M"],["Superhumano","M"],["Arde","A"],["Mon amour","A"],["Friend de Semana","A"],["Hoy es tu cumpleaños","A"],["Duele un montón despedirme de ti","A"],["Apaga la luz","M"],["Déjame entrar","M"],["Todo es azul","M"],["Carolina (cuídale mejor que yo)","M"],["Desde que no estás","M"],["Creo que te quiero","M"],["Canción de amor","M"],["Gigantes","M"],["Ella bailaba","A"],["The Killers","A"],["Dararí","A"],["Perdimos la razón","A"],["Si tú la quieres","A"],["Aunque no sea conmigo","A"],["La chica perfecta","A"],["¿Para qué volver?","A"],["Corazón sin vida","A"],["Cuando te fuiste","A"],["Mariposas","A"],["Presiento","A"],["Sentimiento natural","A"],["Quieres","A"],["Ella era yo","M"],["No hablamos el mismo idioma","M"],["Tie my shoes","M"],["Para mi mejor amiga","M"],["Mi chico","M"],["Cuando hables con él","A"],["Oasis","A"],["6 de febrero","A"],["Superestrella","A"],["Conexión psíquica","A"],["Música en el cielo","A"],["En el centro de la cama","A"],["LIA","A"],["Nada mal","M"],["La historia de nosotros","M"],["¿Qué tiene?","M"],["¿Qué significa el amor?","M"],["Desde que ya no hablamos","A"],["De 1 beso a 2 besos","A"],["Trankis","A"],["Ex ex ex","A"],["Gran Vía","A"],["Un lunes más","M"],["Un segundo","M"],["Blue jeans","M"],["Algo paranormal","M"],["Las Vegas","A"],["Mejor que tú","A"],["Stupid","A"],["Hold","A"],["Cristal","A"],["Popcorn","A"],["El Trece","A"],["Barro y hielo","A"],["No te has ido y ya te extraño","A"],["Estupidez","A"],["Si no vas a volver","A"],["Enemigos","A"],["Alpha09","A"],["Otra noche sin ti","A"],["Tu foto del DNI","A"],["32 de agosto","M"],["Si tiene que ser será","M"],["Berlín","A"],["Otra vez","A"],["Akureyri","A"],["Hermosa casualidad","A"],["4to 23","A"],["Llueve sobre mojado","A"],["Coldplay","A"],["Las dudas","A"],["Luna","A"],["2 Extraños","A"],["24 Rosas","A"],["Ni una más","A"],["Procuro olvidarte","A"],["Con las ganas","A"],["No puedo vivir sin ti","A"],["Volaré","A"],["Like I Can","A"],["Mándame un audio","A"],["Sálvame","A"]];
+mc($("#art"),AR,s=>`¿De quién es «<b>${s[0]}</b>»?`,s=>s[1]==="A"?"Aitana":"Mafalda Cardenal",["Aitana","Mafalda Cardenal"],s=>s[1]==="A"?"Es de Aitana.":"Es de Mafalda Cardenal.",s=>s[1]==="M"?"Mafalda Cardenal":(CATOF(s[0])||"Primeros años"));
+$("#art .hh").hidden=true;$("#art .hint").hidden=true;
+
+/* ---------- Ahorcado ---------- */
+const H={it:null,used:new Set(),err:0,done:false,s:0};
+$("#hang").innerHTML=`<div class="top"><span>Adivina el título letra a letra</span><span class="score">Puntos: <span id="hs">0</span></span></div>
+<p id="hw" style="font:800 1.6rem/1.5 'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:.1em;text-align:center;margin:0 0 6px;overflow-wrap:anywhere"></p>
+<p id="hh" style="text-align:center;color:var(--mute);margin:0 0 12px"></p>
+<div class="kb" id="hk"></div><p class="msg" id="hm" role="status"></p><button class="btn alt" id="hn" hidden>Siguiente</button>
+<p class="hint">Tienes 6 fallos. Sin fallos ganas 3 puntos; con 1 o 2 fallos, 2; con más, 1. Tras 2 fallos aparece una pista.</p>`;
+$("#hk").innerHTML="ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map(l=>`<button data-l="${l.toLowerCase()}">${l}</button>`).join("");
+function hDraw(){
+  const t=H.it[0];let all=true;
+  $("#hw").textContent=[...t].map(c=>{const n=norm(c);if(!n||/[0-9]/.test(n))return c===" "?"\u00a0\u00a0":c;if(H.used.has(n))return c;all=false;return "_"}).join(" ");
+  $("#hh").textContent=`Fallos: ${H.err}/6`+(H.err>=2?" — Pista: "+H.it[1]:"");
+  return all;
+}
+function hNew(){
+  const L=RV.filter(s=>okF(s[0],CATOF(s[0])));
+  H.used=new Set();H.err=0;H.done=false;
+  [...$("#hk").children].forEach(b=>{b.disabled=false;b.className=""});
+  $("#hm").textContent="";$("#hm").className="msg";$("#hn").hidden=true;
+  if(!L.length){H.it=["",""];$("#hw").textContent="—";$("#hh").textContent="No hay canciones de esta categoría aquí. Cambia el filtro.";H.done=true;return}
+  const prev=H.it;do{H.it=pick(L)}while(H.it===prev&&L.length>1);hDraw();
+}
+$("#hk").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b||H.done||b.disabled)return;
+  const l=b.dataset.l;H.used.add(l);b.disabled=true;
+  const ok=norm(H.it[0]).includes(l);b.className=ok?"good":"bad";if(!ok)H.err++;
+  const all=hDraw(),m=$("#hm");
+  if(all){H.done=true;const p=H.err===0?3:H.err<=2?2:1;H.s+=p;$("#hs").textContent=H.s;m.textContent=`¡Sí! +${p} puntos`;m.className="msg ok";$("#hn").hidden=false}
+  else if(H.err>=6){H.done=true;$("#hw").textContent=H.it[0];m.textContent="Era: "+H.it[0];m.className="msg bad";$("#hn").hidden=false}
+});
+$("#hn").onclick=hNew;hNew();HOOKS.push(hNew);
+
+/* ---------- Palabra que falta ---------- */
+const GAP=AR.map(([t,f])=>{
+  const ws=t.replace(/[()]/g,"").split(" "),c=ws.filter(w=>norm(w).length>=4);
+  if(!c.length||ws.length<2)return null;
+  const w=c.slice().sort((a,b)=>b.length-a.length)[0];return [t,t.replace(w,"_____"),w,f];
+}).filter(Boolean);
+mc($("#gap"),GAP,s=>`Falta una palabra del título: «<b>${s[1]}</b>»`,s=>s[2],[...new Set(GAP.map(g=>g[2]))],s=>`Es «${s[0]}».`,s=>s[3]==="M"?"Mafalda Cardenal":(CATOF(s[0])||"Primeros años"));
+
+/* ---------- Parejas ---------- */
+const PA=[...CO.map(([t,c])=>[t,c,CATOF(t)||"Colaboraciones"]),...MT.map(([t,n])=>[t,"Pista "+n,"Mafalda Cardenal"])];
+const P={sel:null,found:0,moves:0,n:0,lock:false};
+$("#pair").innerHTML=`<div class="top"><span id="pm">Intentos: 0</span><span class="score">Parejas: <span id="pf">0</span></span></div>
+<p style="margin:0 0 10px;font-weight:600">Une cada canción con su dúo o con su número de pista en Mis notas de voz.</p>
+<div class="mem" id="pg"></div><p class="msg" id="pt" role="status"></p><button class="btn alt" id="pn">Nueva partida</button>`;
+function pNew(){
+  const seen=new Set(),pairs=[];
+  sh(PA.filter(p=>okF(p[0],p[2]))).forEach(p=>{if(pairs.length<6&&!seen.has(p[1])){seen.add(p[1]);pairs.push(p)}});
+  P.sel=null;P.found=0;P.moves=0;P.n=pairs.length;P.lock=false;
+  $("#pt").textContent="";$("#pt").className="msg";$("#pm").textContent="Intentos: 0";$("#pf").textContent="0";
+  if(pairs.length<2){$("#pg").innerHTML="";$("#pt").textContent="Hacen falta al menos dos canciones de esta categoría. Cambia el filtro.";$("#pt").className="msg bad";P.n=0;return}
+  const cards=sh(pairs.flatMap((p,i)=>[{i,t:p[0]},{i,t:p[1],r:1}]));
+  $("#pg").innerHTML=cards.map(c=>`<button data-i="${c.i}" data-r="${c.r||0}">${c.t}</button>`).join("");
+}
+$("#pg").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b||P.lock||b.classList.contains("done")||b===P.sel)return;
+  if(!P.sel){P.sel=b;b.classList.add("sel");return}
+  const a=P.sel;P.moves++;$("#pm").textContent="Intentos: "+P.moves;
+  if(a.dataset.i===b.dataset.i&&a.dataset.r!==b.dataset.r){
+    a.classList.remove("sel");a.classList.add("done");b.classList.add("done");P.sel=null;P.found++;$("#pf").textContent=P.found;
+    if(P.found===P.n){$("#pt").textContent=`¡Completado en ${P.moves} intentos!`;$("#pt").className="msg ok"}
+  }else{b.classList.add("wrong");P.lock=true;setTimeout(()=>{a.classList.remove("sel");b.classList.remove("wrong");P.sel=null;P.lock=false},700)}
+});
+$("#pn").onclick=pNew;pNew();HOOKS.push(pNew);
+
+/* ---------- Verdadero o falso ---------- */
+const TF=[];
+CO.forEach(([t,c])=>{
+  const k=CATOF(t)||"Colaboraciones",o=sh(CO.map(x=>x[1]).filter(x=>x!==c))[0];
+  TF.push([t,`«${t}» es un dúo con ${c}.`,"Verdadero",`Es con ${c}.`,k]);
+  TF.push([t,`«${t}» es un dúo con ${o}.`,"Falso",`Es con ${c}.`,k]);
+});
+ALS.forEach(s=>{
+  const P=PIST[s[2]];
+  if(P){
+    const c=P[2],k=P[4],tot=pTot(s,P);
+    let o;do{o=1+Math.floor(Math.random()*c)}while(String(o)===s[1]);
+    TF.push([s[0],`«${s[0]}» es la pista ${s[1]} de ${P[0]}.`,"Verdadero",`Es la pista ${s[1]}${tot}.`,k]);
+    TF.push([s[0],`«${s[0]}» es la pista ${o} de ${P[0]}.`,"Falso",`Es la pista ${s[1]}${tot}.`,k]);
+  }else{
+    const o=sh(AL.filter(x=>x!==s[1]))[0],k=ALC[s[1]];
+    TF.push([s[0],`«${s[0]}» está en ${s[1]}, de Aitana.`,"Verdadero",`Está en ${s[1]} (${ALY[s[1]]}).`,k]);
+    TF.push([s[0],`«${s[0]}» está en ${o}, de Aitana.`,"Falso",`Está en ${s[1]} (${ALY[s[1]]}).`,k]);
+  }
+});
+const TFX=[
+ ["Operación Triunfo","Aitana salió de Operación Triunfo 2017.","Verdadero","Sí, salió de OT 2017.","Primeros años"],
+ ["Spoiler segundo","Spoiler es el segundo álbum de Aitana.","Falso","Es su primer álbum (2019).","Primeros años"],
+ ["Arde con Ana Guerra","Arde es un dúo de Aitana con Ana Guerra.","Falso","Arde es en solitario; el dúo fue Lo malo.","Primeros años"],
+ ["La última","Aitana protagonizó la serie La última, de Disney+.","Verdadero","Sí, debutó como actriz en 2022.",null],
+ ["Alpha 2021","Alpha salió en 2021.","Falso","Alpha salió en septiembre de 2023.","Alpha"],
+ ["Cuarto azul 19","Cuarto azul tiene 19 canciones.","Verdadero","Sí, tiene 19.","Cuarto azul"],
+ ["Mis notas de voz colaboraciones","Mis notas de voz tiene varias colaboraciones.","Falso","No tiene ninguna.","Mafalda Cardenal"],
+ ["Mafalda Alicante","Mafalda Cardenal es de Alicante.","Verdadero","Sí, es alicantina.","Mafalda Cardenal"],
+ ["Tu fan 2023","Tu fan se hizo viral en 2023.","Verdadero","Sí, fue su primer gran éxito.","Mafalda Cardenal"],
+ ["Suchard","Mafalda Cardenal protagonizó un anuncio navideño de Suchard.","Verdadero","Sí, batió récords de reproducciones.","Mafalda Cardenal"],
+ ["Mis notas 12","Mis notas de voz tiene 12 canciones.","Falso","Tiene 18 pistas.","Mafalda Cardenal"],
+ ["Mon Amour platino","«Mon Amour (Remix)», de Aitana y Zzoilo, es diez veces platino en España.","Verdadero","Sí, llegó al número 1 en 2021 y suma diez discos de platino.","Colaboraciones"],
+ ["Belonia primer álbum","Belonia es el primer álbum de Mafalda Cardenal.","Falso","Es su segundo álbum; el primero fue Mis notas de voz (2025).","Mafalda Cardenal"]
+];
+TFX.forEach(x=>TF.push(x));
+mc($("#tf"),TF,s=>`<b>${s[1]}</b><br>¿Verdadero o falso?`,s=>s[2],["Verdadero","Falso"],s=>s[3],s=>s[4]);
+$("#tf .hh").hidden=true;$("#tf .hint").hidden=true;
+
+/* ---------- Trivia ---------- */
+const TV=[
+ ["¿En qué año nació la cantante Aitana?","1999",["1997","2001","2003"],"Aitana nació el 27 de junio de 1999.",null],
+ ["¿De qué programa salió Aitana?","Operación Triunfo",["La Voz","Factor X","Tu cara me suena"],"Aitana fue concursante de Operación Triunfo 2017.","Primeros años"],
+ ["¿Cuál fue el primer álbum de Aitana?","Spoiler",["11 Razones","Alpha","Cuarto azul"],"Spoiler salió el 7 de junio de 2019 y fue número 1 de ventas.","Primeros años"],
+ ["¿Cómo se llama el primer EP de Aitana, de noviembre de 2018?","Tráiler",["Spoiler","Teaser","Preview"],"El EP Tráiler salió en noviembre de 2018.","Primeros años"],
+ ["¿Con qué canción en solitario optó Aitana a Eurovisión 2018?","Arde",["Nada sale mal","Teléfono","Formentera"],"Aitana presentó Arde en solitario y Lo malo con Ana Guerra.","Primeros años"],
+ ["¿En qué ciudad empezó Aitana a trabajar su álbum debut?","Los Ángeles",["Miami","Londres","Madrid"],"Aitana empezó a trabajarlo en Los Ángeles tras salir del concurso.","Primeros años"],
+ ["¿Cuántos discos de platino tiene «Lo malo», de Aitana y Ana Guerra?","5",["2","3","7"],"«Lo malo» es cinco veces platino en España.","Primeros años"],
+ ["¿A qué premio fue nominado Spoiler, de Aitana, en los Latin Grammy de 2020?","Mejor álbum vocal pop",["Álbum del año","Mejor canción pop","Artista revelación"],"Spoiler también fue nominado a Mejor álbum en los Premios Odeón.","Primeros años"],
+ ["¿Qué estilo marcó el álbum 11 Razones, de Aitana?","Pop-punk y pop-rock de los 2000",["Eurodance de los 90","Flamenco","Folk acústico"],"11 Razones salió el 11 de diciembre de 2020.","11 Razones"],
+ ["¿Quién participó como coautor de «Corazón sin vida», de Aitana y Sebastián Yatra?","Alejandro Sanz",["Pablo Alborán","Manuel Carrasco","Malú"],"La canción incluye guiños a «Corazón partío».","11 Razones"],
+ ["¿Dónde empezó Aitana la gira 11 Razones?","Barcelona",["Madrid","Valencia","Sevilla"],"La gira empezó en su ciudad natal.","11 Razones"],
+ ["¿Qué recinto de Madrid llenó Aitana dos veces en la gira 11 Razones?","WiZink Center",["Palau Sant Jordi","Estadi Olímpic","Teatro Real"],"Hoy ese recinto se llama Movistar Arena.","11 Razones"],
+ ["¿Qué sonido recuperó Aitana en su álbum Alpha?","Eurodance y electrónica de los 90",["Reguetón clásico","Rock sinfónico","Trap"],"Alpha salió el 22 de septiembre de 2023.","Alpha"],
+ ["¿Cuántos discos de platino tiene «Las Babys», de Aitana?","4",["1","2","6"],"«Las Babys» es cuatro veces platino.","Alpha"],
+ ["¿De qué éxito de los 90 parte «Las Babys», de Aitana?","Saturday Night, de Whigfield",["Macarena","Barbie Girl","Mambo No. 5"],"Aitana reinterpreta ese tema de baile.","Alpha"],
+ ["¿Cuántas canciones tiene Cuarto azul, el álbum de Aitana?","19",["11","13","16"],"Cuarto azul salió el 30 de mayo de 2025.","Cuarto azul"],
+ ["¿Cuántas colaboraciones tiene Cuarto azul, el álbum de Aitana?","7",["3","5","10"],"Incluye a Alaska, Jay Wheeler, Danny Ocean, Kenia OS, Ela Taubert, Barry B y Myke Towers.","Cuarto azul"],
+ ["¿Con cuál de estos artistas colabora Aitana en Cuarto azul?","Jay Wheeler",["Bad Bunny","Rauw Alejandro","Karol G"],"También colabora con Alaska, Danny Ocean, Kenia OS, Ela Taubert y Barry B.","Cuarto azul"],
+ ["¿Qué color acompaña la era de Cuarto azul, de Aitana?","Azul Klein",["Rojo carmín","Verde menta","Amarillo limón"],"El vinilo del álbum es azul Klein.","Cuarto azul"],
+ ["¿Cómo suena Cuarto azul, de Aitana, comparado con Alpha?","Más lento y de baladas",["Más bailable","Más punk","Más flamenco"],"Alpha era eurodance; Cuarto azul adopta un estilo más pausado.","Cuarto azul"],
+ ["¿Dónde presentó Aitana Cuarto azul en una listening party con unos 10.000 fans?","Movistar Arena de Madrid",["Roig Arena","Palau Sant Jordi","Santiago Bernabéu"],"Aitana cantó y comentó las 19 canciones.","Cuarto azul"],
+ ["¿A quién recuerda Aitana en «Música en el cielo»?","A su abuelo",["A su perro","A su madre","A una amiga"],"Es una de las canciones más personales de Cuarto azul.","Cuarto azul"],
+ ["¿Qué invitado cantó con Aitana en el primer show de Metamorfosis Season?","David Bisbal",["Alejandro Sanz","Pablo Alborán","Melendi"],"David Bisbal cantó con Aitana «Si tú la quieres»; también actuó Hombres G.",null],
+ ["¿De qué ciudad es la cantante Mafalda Cardenal?","Alicante",["Valencia","Murcia","Málaga"],"Mafalda Cardenal es alicantina.","Mafalda Cardenal"],
+ ["¿Qué canción hizo viral a Mafalda Cardenal en 2023?","Tu fan",["Vete a la luna","En mi balcón","Solo un nombre"],"«Tu fan» triunfó en TikTok y superó los 100 millones de reproducciones.","Mafalda Cardenal"],
+ ["¿Cómo se llama el álbum debut de Mafalda Cardenal?","Mis notas de voz",["Belonia","Notas de WhatsApp","Diario azul"],"Mis notas de voz salió el 25 de abril de 2025.","Mafalda Cardenal"],
+ ["¿De dónde nació el álbum debut de Mafalda Cardenal?","De audios de WhatsApp grabados en su cuarto",["De un viaje a México","De improvisaciones en el estudio","De poemas de su abuela"],"Por eso se llama Mis notas de voz.","Mafalda Cardenal"],
+ ["¿Cuántas colaboraciones tiene Mis notas de voz, de Mafalda Cardenal?","Ninguna",["Una","Tres","Cinco"],"Mafalda Cardenal lo compuso y escribió ella sola.","Mafalda Cardenal"],
+ ["¿De qué marca protagonizó Mafalda Cardenal un anuncio navideño?","Suchard",["Freixenet","Campofrío","El Almendro"],"El anuncio batió récords de reproducciones.","Mafalda Cardenal"],
+ ["¿Cómo se llama el segundo álbum de Mafalda Cardenal?","Belonia",["Notas azules","Diario de Mafalda","Superhumano"],"Belonia sale el 16 de octubre de 2026 con 12 pistas.","Mafalda Cardenal"],
+ ["¿Cuántas pistas tiene Belonia, de Mafalda Cardenal?","12",["10","14","18"],"Mis notas de voz tenía 18.","Mafalda Cardenal"],
+ ["¿Con qué cantante participa Mafalda Cardenal en «¿Qué significa el amor?»?","Carlos Rivera",["Camilo","Alejandro Fernández","Sebastián Yatra"],"Es un tema del repertorio de Carlos Rivera.","Mafalda Cardenal"],
+ ["¿Qué discográfica publica Mis notas de voz, de Mafalda Cardenal?","Sony Music",["Universal Music","Warner Music","Subterfuge"],"Aitana, en cambio, publica con Universal Music Spain.","Mafalda Cardenal"],
+ ["¿Dónde fue el primer concierto de Mafalda Cardenal en México?","Guadalajara",["Monterrey","Querétaro","León"],"Mafalda Cardenal contó que fue con unas cien personas.","Mafalda Cardenal"],
+ ["Mafalda Cardenal: ¿qué le inspira más a la hora de escribir, según ella?","El desamor",["El amor feliz","La naturaleza","Los viajes"],"Lo dijo en una entrevista: «cien por ciento el desamor».","Mafalda Cardenal","Desamor"],
+ ["¿Cómo describe Mafalda Cardenal las historias de Mis notas de voz?","Casi todas, desgracias amorosas",["Cuentos de fantasía","Anécdotas de giras","Poemas sobre su ciudad"],"Dice que las 18 canciones son vivencias propias.","Mafalda Cardenal","Desamor"],
+ ["¿En qué estado de ánimo escribió Mafalda Cardenal «Tu fan»?","Triste, recién dejada por su pareja",["Muy feliz, de viaje","Aburrida, en clase","Enfadada, tras una discusión con su banda"],"La olvidó entre sus notas de voz y la terminó cuando ya estaba feliz.","Mafalda Cardenal","Desamor"],
+ ["¿Qué recorrido resume Rolling Stone en Mis notas de voz, de Mafalda Cardenal?","Del desamor a la sanación",["De la fama al silencio","Del miedo a la fiesta","Del campo a la ciudad"],"Es el título de su reportaje sobre el álbum.","Mafalda Cardenal","Desamor"],
+ ["¿En qué canción de Mafalda Cardenal se siente reducida a «solo un nombre» tras la ruptura?","Solo un nombre",["Vete a la luna","Superhumano","Venecia"],"En la canción, su propio nombre deja de gustarle porque ya no lo dice la otra persona.","Mafalda Cardenal","Desamor"],
+ ["¿Qué canción de Mafalda Cardenal presentó Rolling Stone como «una historia de amor propio»?","No estábamos juntos",["Tu fan","Carolina","Mi chico"],"Es una de las canciones que adelantó Mis notas de voz.","Mafalda Cardenal","Superación"],
+ ["¿Qué dice la abuela de Mafalda Cardenal sobre sus canciones?","Que le rompen mucho el corazón",["Que son demasiado alegres","Que suenan antiguas","Que son muy largas"],"Mafalda lo contó entre risas en una entrevista.","Mafalda Cardenal","Desamor"],
+ ["¿Qué le dicen a Mafalda Cardenal sus managers cuando termina una relación?","Que hace grandes canciones",["Que descanse un mes","Que no publique nada","Que se vaya de gira"],"Para ella, el desamor es lo que mejor le funciona al componer.","Mafalda Cardenal","Desamor"],
+ ["¿Qué proceso emocional recorre Cuarto azul, el álbum de Aitana?","El posterior a una ruptura: nostalgia, enfado, negación y contradicción",["El de una historia de amor feliz","El de unas vacaciones de verano","El de una gira por Latinoamérica"],"Así lo describe Rolling Stone.","Cuarto azul","Desamor"],
+ ["¿Qué dijo Aitana sobre Cuarto azul al presentarlo?","Que no se ha inventado nada: es lo que le ha pasado",["Que es todo ficción","Que son canciones de encargo","Que son canciones antiguas"],"Aitana presentó el álbum en una listening party masiva.","Cuarto azul","Desamor"],
+ ["¿Qué canción de Cuarto azul, de Aitana, muchos interpretan como una carta a su expareja?","Cuando hables con él",["Las Babys","Formentera","Superestrella"],"Es una balada íntima del álbum.","Cuarto azul","Desamor"],
+ ["¿Qué dijo Aitana de «Cuando hables con él» antes del lanzamiento del álbum?","Que en principio no iba a incluirla porque no estaba preparada",["Que la cantaría con Bisbal","Que ya la había grabado en 2019","Que sería el single de verano"],"Al final la canción sí entró entre las 19 de Cuarto azul.","Cuarto azul","Desamor"],
+ ["Según la prensa, ¿de qué hablan las canciones de Spoiler, de Aitana?","De amor, desamor y crecimiento personal",["De política y sociedad","De viajes por el mundo","De recuerdos de la infancia"],"Spoiler es el primer álbum de Aitana.","Primeros años","Desamor"],
+ ["¿Qué temas recorre Alpha, de Aitana, según la agencia EFE?","Amor, desamor, contradicción, empoderamiento y deseo",["Solo fiesta y verano","Solo nostalgia","Política y humor"],"Alpha es un disco de principios, y algunos finales.","Alpha","Desamor"],
+ ["¿Cómo llama Aitana a Cuarto azul?","Su lugar seguro, donde vuelve a ella",["Su disco de fiesta","Su proyecto más comercial","Su álbum de versiones"],"Lo dijo en una listening party.","Cuarto azul"]
+,
+ ["¿Qué premio ganó Cuarto azul, de Aitana, en los Latin Grammy de 2025?","Mejor diseño de empaque",["Mejor álbum del año","Mejor canción pop","Artista revelación"],"También estuvo nominado a Mejor álbum de pop contemporáneo; fue su primer premio en esa gala.","Cuarto azul"],
+ ["¿Cuántas semanas estuvo «Gran Vía», de Aitana y Quevedo, en el número 1 de España?","3",["1","5","8"],"Fue número 1 en España y es cuatro veces platino.","Colaboraciones"],
+ ["¿Qué sonidos mezcla Cuarto azul, de Aitana?","Electropop, synth-pop, new wave y power ballads",["Reguetón puro","Folk y country","Trap y drill"],"Es un disco más lento y maduro que Alpha.","Cuarto azul"],
+ ["¿Qué representa el azul para Aitana en Cuarto azul?","Su cuarto de infancia, pintado de azul Klein",["Un viaje a Miami","Su color favorito en la ropa","Un vestuario de gira"],"Para ella, el azul es un espacio seguro.","Cuarto azul"],
+ ["¿Qué pista de Cuarto azul, de Aitana, funciona como interludio entre las dos mitades?","Luz de la mañana",["Trankis","LIA","Ex ex ex"],"La primera mitad es oscura y la segunda habla de sanación.","Cuarto azul"],
+ ["¿Cuál fue el primer single de Cuarto azul, de Aitana?","Segundo intento",["6 de febrero","Superestrella","Sentimiento natural"],"Salió a finales de enero de 2025.","Cuarto azul"],
+ ["¿Qué single de Cuarto azul, de Aitana, con sonidos tropicales, fue su primer top 10?","Sentimiento natural",["Segundo intento","Superestrella","LIA"],"La canta con Myke Towers.","Cuarto azul"],
+ ["¿Hasta qué puesto subió «6 de febrero», de Aitana, en la lista de PROMUSICAE?","El 2",["El 1","El 5","El 8"],"Fue su primer top 3 de ese álbum.","Cuarto azul"],
+ ["¿Cuántas ciudades incluye el Cuarto Azul World Tour 2026, de Aitana?","24",["10","15","40"],"Pasa por Europa, Estados Unidos y Latinoamérica.","Cuarto azul"],
+ ["¿Qué ánimo anuncia Belonia, el segundo álbum de Mafalda Cardenal?","Más luminoso: optimismo y amor",["Más oscuro y rabioso","Solo fiesta","Más triste todavía"],"Habla de dejar atrás los malos rollos.","Mafalda Cardenal","Superación"],
+ ["¿Qué pista cierra Belonia, de Mafalda Cardenal?","La que da nombre al álbum",["Gigantes","Canción de amor","Algo paranormal"],"Belonia tiene 12 pistas y la última lleva el título del disco.","Mafalda Cardenal"]
+,
+ ["¿Qué certificación tiene Spoiler, de Aitana, en España?","Platino",["Oro","Doble platino","Diamante"],"Superó las 40.000 unidades; fue oro en su primera semana.","Primeros años"],
+ ["¿Qué tipo de canción es «Con la miel en los labios», de Aitana?","Una balada latina con piano",["Un tema de trap","Un reguetón","Una canción de rock"],"Superó los 340.000 reproducciones en Spotify en 24 horas.","Primeros años"],
+ ["¿Quiénes produjeron «Me quedo», de Aitana y Lola Indigo?","Alizzz y El Guincho",["Andrés Torres y Mauricio Rengifo","Nico Cotton","Quevedo y Bizarrap"],"También produjeron para C. Tangana y Rosalía.","Primeros años"],
+ ["¿Qué récord logró Spoiler, de Aitana, en Spotify España en 2019?","El mejor debut en streaming del año, con 1,77 millones en 24 horas",["El álbum más corto del año","El primero en superar los 10 millones","El primero grabado en directo"],"Fue el tercer debut más fuerte en un día de la historia de Spotify España en ese momento.","Primeros años"],
+ ["¿Qué cuenta el concepto de 11 Razones, de Aitana?","Las razones para dejar a una pareja ficticia",["Un viaje por once países","Once recuerdos de infancia","Once consejos para cantar"],"Aitana pensó primero en símbolos matemáticos para ordenar las canciones.","11 Razones","Desamor"],
+ ["¿Quiénes produjeron 11 Razones, de Aitana?","Andrés Torres y Mauricio Rengifo",["Alizzz y El Guincho","Nico Cotton","Bizarrap"],"Mauricio Rengifo y Andrés Torres ganaron el Latin Grammy a Productor del año en 2020.","11 Razones"],
+ ["¿Cuántos discos de platino tiene 11 Razones, de Aitana?","2",["1","3","5"],"Es doble platino en España y platino en Argentina.","11 Razones"],
+ ["¿Cuántas canciones tiene 11 Razones, de Aitana, en la lista oficial?","11",["9","14","19"],"El disco físico incluye además una canción oculta.","11 Razones"],
+ ["¿Cómo se llama la canción oculta del disco físico de 11 Razones, de Aitana?","Adiós",["Hola","Luz","Final"],"Aparece al final del tema que da título al álbum.","11 Razones"],
+ ["¿Qué canción de 11 Razones, de Aitana y Natalia Lacunza, fue la mejor colaboración femenina en streaming de 2020?","Cuando te fuiste",["Estupidez","Si no vas a volver","Más de lo que aposté"],"Se estrenó con la mejor cifra de ese año para una colaboración femenina española.","11 Razones"],
+ ["¿Qué estilo adoptó Aitana en 11 Razones?","Pop-rock y garage pop de principios de los 2000",["Eurodance de los 90","Flamenco pop","Salsa"],"Es un giro respecto a Spoiler.","11 Razones"]
+,
+ ["¿Cuántas canciones tiene Alpha, el álbum de Aitana?","15",["9","12","19"],"Alpha salió el 22 de septiembre de 2023.","Alpha"],
+ ["¿Cuántos discos de platino tiene Alpha, de Aitana?","3",["1","2","5"],"Fue número 1 en España.","Alpha"],
+ ["¿Cómo se llama la canción que Aitana enseñó en el tráiler de Alpha, en marzo de 2023?","Alpha09",["Los Ángeles","Las Babys","Dararí"],"Con ese tráiler empezó a anunciar la nueva era.","Alpha"],
+ ["¿Cuántos conciertos anunció Aitana en España al presentar el Alpha Tour?","7",["3","12","20"],"Las entradas salieron a la venta el 21 de junio de 2023.","Alpha"],
+ ["¿Con qué artista canta Aitana «Tu foto del DNI»?","Marmi",["Rels B","Quevedo","Danna Paola"],"La canción suena en sus conciertos junto a «Mon amour».","Colaboraciones"],
+ ["¿Cuál fue el primer single de Mafalda Cardenal, en 2021?","32 de agosto",["Tu fan","Vete a la luna","Si tiene que ser será"],"Después llegaron «Pa que me cantes en el coche» y «Si tiene que ser será».","Mafalda Cardenal"],
+ ["¿Cómo se llama el anuncio navideño de Suchard en el que debutó como actriz Mafalda Cardenal?","Son todas Navidades",["Navidad en casa","La mejor Navidad","Cada Navidad es única"],"Es un spot en stop motion con un nuevo jingle de la marca.","Mafalda Cardenal"],
+ ["¿Cómo describe su discográfica «Esto iba a ser una canción de amor», de Mafalda Cardenal?","Un himno a los lunes tristes y a las cartas sin enviar",["Una canción para bailar","Un tema de verano","Una versión de un clásico"],"Habla de un amor que no se olvida fácilmente.","Mafalda Cardenal","Desamor"],
+ ["¿Qué guitarra toca Mafalda Cardenal, según una marca de guitarras?","Una Alhambra acústica personalizada",["Una guitarra eléctrica roja","Un ukelele","Una guitarra clásica de su abuelo"],"Es una de las artistas de la marca.","Mafalda Cardenal"]
+,
+ ["¿Cuál es el nombre completo de Aitana?","Aitana Ocaña Morales",["Aitana Morales Ocaña","Aitana Ocaña Ruiz","Aitana Cardenal Morales"],"Nació el 27 de junio de 1999 en Cataluña.",null],
+ ["¿Cuántos álbumes de estudio tiene Aitana?","4",["2","3","6"],"Spoiler, 11 Razones, Alpha y Cuarto azul.",null],
+ ["¿Con qué discográfica publica sus discos Aitana?","Universal Music Spain",["Sony Music","Warner Music","Subterfuge"],"Mafalda Cardenal, en cambio, publica con Sony.",null],
+ ["¿Qué hizo Aitana, además de actuar, en la serie La última?","Grabó la banda sonora",["Dirigió la serie","Escribió el guion","Hizo de productora"],"La última se estrenó en Disney+ en 2022.",null],
+ ["¿En qué película de 2024 aparece Aitana?","Love, Divided",["Élite","Las chicas del cable","Cuéntame"],"Es una película en la que tuvo un papel además de su carrera musical.",null],
+ ["¿Qué dos artistas se sumaron al remix de «Lo malo», de Aitana y Ana Guerra?","Greeicy y TINI",["Karol G y Becky G","Danna Paola y Lola Indigo","Nicki Nicole y Emilia"],"El remix reunió a cuatro cantantes.","Primeros años"],
+ ["¿Cuál fue la primera canción en solitario que lanzó Aitana?","Teléfono",["Arde","Nada sale mal","Vas a quedarte"],"«Teléfono» fue el primer sencillo del EP Tráiler y llegó a lo más alto de las listas seis semanas.","Primeros años"],
+ ["¿Cuánto dura aproximadamente un concierto del Alpha Tour, de Aitana?","Una hora y media",["Cuarenta minutos","Tres horas","Cuatro horas"],"En ese tiempo condensa los 15 temas del álbum y sus grandes éxitos.","Alpha"],
+ ["¿Qué canario colabora con Aitana en «Gran Vía»?","Quevedo",["Quevedo y Bizarrap","Rels B","Myke Towers"],"Estuvo tres semanas en el número 1 de España.","Colaboraciones"],
+ ["¿Cómo se llama la gira de 2025 en la que Aitana cantó en directo «En el centro de la cama»?","Metamorfosis Season",["Alpha Tour","Play Tour","11 Razones Tour"],"Rolling Stone destacó esa canción como una de las más emotivas del show.","Cuarto azul"],
+ ["¿Cuántos años tenía Mafalda Cardenal cuando «Tu fan» se hizo viral en 2023?","21",["17","19","25"],"Es alicantina y compone sus propias canciones.","Mafalda Cardenal"],
+ ["¿En qué lista de Spotify llegó al número 1 «Tu fan», de Mafalda Cardenal?","Los 50 Más Virales",["Top 50 Global","Éxitos de España","Novedades Viernes"],"También llegó al número 1 en España, Argentina y México.","Mafalda Cardenal"],
+ ["¿En cuántos países llegó «Tu fan» al número 1 de virales, según su marca de guitarras?","En más de 25",["En 5","En 10","En 100"],"La canción acumula más de 100 millones de reproducciones.","Mafalda Cardenal"],
+ ["¿De qué color era la primera guitarra de Mafalda Cardenal?","Rosa",["Negra","Azul","Roja"],"Hoy toca una guitarra acústica Alhambra personalizada.","Mafalda Cardenal"],
+ ["¿Cómo se define Mafalda Cardenal a sí misma?","Una chica normal que canta lo que le pasa",["Una estrella del rock","Una poeta","Una actriz"],"Es su forma de ver sus canciones: vivencias propias.","Mafalda Cardenal"],
+ ["¿Qué incluía el pack del CD de Mis notas de voz, de Mafalda Cardenal?","Pegatinas diseñadas por ella y un póster con letra",["Una púa de guitarra","Una camiseta","Una entrada de concierto"],"El póster llevaba una foto suya y la letra de una canción.","Mafalda Cardenal"],
+ ["¿Dónde presentó Mafalda Cardenal Mis notas de voz en un showcase, un día antes de su lanzamiento?","Espacio Movistar",["Sala Apolo","Palau de la Música","Teatro Real"],"El álbum salió el 25 de abril de 2025.","Mafalda Cardenal"],
+ ["¿En cuántas ciudades de México iba a presentar Mafalda Cardenal Mis notas de voz?","Hasta siete",["Una","Tres","Doce"],"Entre ellas Ciudad de México, León, Monterrey, Guadalajara y Querétaro.","Mafalda Cardenal"],
+ ["¿Quién produjo la intro de Mis notas de voz, de Mafalda Cardenal?","Ella misma",["Alizzz","Andrés Torres","Bizarrap"],"El álbum está concebido, compuesto y escrito por ella al 100%.","Mafalda Cardenal"],
+ ["¿Con qué formato actúa Mafalda Cardenal en algunas de sus fechas de 2026, como Las Palmas?","Acústico",["Con orquesta","Con DJ","Con banda de nueve personas"],"En Las Palmas actuó en la Sala Alboroto el 26 de abril de 2026.","Mafalda Cardenal"],
+ ["¿Con qué canción cita la prensa a «Pa que me cantes en el coche», de Mafalda Cardenal, como uno de sus primeros éxitos?","Si tiene que ser será",["Tu fan","Vete a la luna","Superhumano"],"Su primer single fue «32 de agosto», en 2021.","Mafalda Cardenal"]
+,
+ ["¿Cuántos discos de platino tiene «Mon Amour (Remix)», de Aitana y Zzoilo, en España?","10",["4","6","8"],"Llegó al número 1 en 2021 y arrasó también en México.","Colaboraciones"],
+ ["¿Cuántos discos de platino tiene «Formentera», de Aitana y Nicki Nicole?","7",["3","5","10"],"Llegó al puesto 3 en España.","Alpha"],
+ ["¿Cuántos discos de platino tiene «Superestrella», de Aitana?","6",["2","4","10"],"Llegó al puesto 2 en España y al 1 en México.","Cuarto azul"],
+ ["¿Cuántos discos de platino tiene «Mariposas», de Aitana y Sangiovanni?","5",["1","3","8"],"Salió en 2022 como single suelto.","Singles sueltos"],
+ ["¿Cuántos discos de platino tiene «Teléfono», de Aitana?","4",["2","3","6"],"Debutó en el número 1 de la lista española.","Primeros años"],
+ ["¿Cuántos discos de platino tiene Cuarto azul, de Aitana?","3",["1","2","5"],"Fue número 1 en España.","Cuarto azul"],
+ ["¿En qué álbum de Morat aparece «Presiento», de Aitana y Morat?","Balas perdidas",["Sobre el amor y sus efectos secundarios","¿A dónde vamos?","Si ayer fuera hoy"],"Salió en 2019 y es cuatro veces platino.","Colaboraciones"],
+ ["¿De qué álbum de David Bisbal es «Si tú la quieres», cantada con Aitana?","En tus planes",["Premonición","Hecho en España","Sin mirar atrás"],"Es cuatro veces platino en España.","Colaboraciones"],
+ ["¿Qué es Akureyri, el título de la canción de Aitana y Sebastián Yatra?","Una ciudad de Islandia",["Una isla griega","Un cantante noruego","Un volcán de Japón"],"La canción salió en 2024 y llegó al puesto 8.","Singles sueltos"],
+ ["¿Cuántos números 1 de singles acumula Aitana, según su ficha de Wikipedia?","5",["2","8","10"],"También suma 30 canciones en el top 10.",null],
+ ["¿Cuántas canciones de Aitana han entrado en las listas, según su ficha de Wikipedia?","92",["30","50","150"],"Es una de las artistas con más canciones debutando en las listas españolas.",null],
+ ["¿Cómo se llama el disco que recoge sus canciones de Operación Triunfo 2017?","Sus canciones (Operación Triunfo 2017)",["Primeras notas","Tráiler","Aitana en directo"],"Salió el 16 de marzo de 2018 y llegó al puesto 2.","Primeros años"],
+ ["¿Con qué sello publicó Aitana la banda sonora de La última?","Hollywood Records",["Universal Spain","Sony Music","Warner Records"],"El disco salió el 2 de diciembre de 2022.","Singles sueltos"],
+ ["¿Qué versión benéfica de 2021, con muchos artistas, incluyó a Aitana junto a Miguel Ríos?","Himno a la Alegría",["Hay que vivir","Libre","El ritmo de la vida"],"Buscaba llevar esperanza durante la pandemia.","Singles sueltos"]
+];
+TV.forEach(s=>{if(s[5])TH[norm(s[0])]=s[5]});
+mc($("#trivia"),TV,s=>`<b>${s[0]}</b>`,s=>s[1],s=>s[2],s=>s[3],s=>s[4]);
+
+/* ---------- De qué va ---------- */
+textGame($("#plot"),[
+ mk("Nada sale mal","Primeros años",["Invita a lanzarse a una relación sin miedo","Es una canción de amor optimista de un primer álbum","Es de Aitana, de Spoiler","Empieza por N"]),
+ mk("Los Ángeles","Alpha",["Parece contar un romance cargado de pasión y de nostalgia","Habla de tentación y de luces de neón en una ciudad de California","Es de Aitana, primer single de Alpha","Empieza por L"]),
+ mk("Las Babys","Alpha",["Convierte un éxito de baile de los 90 en un tema de discoteca actual","Su base es Saturday Night, de Whigfield","Es de Aitana, de Alpha","Empieza por L"]),
+ mk("Formentera","Alpha",["Un tema de verano, con ambiente house, que lleva el nombre de una isla","La canta con una artista argentina","Es de Aitana","Empieza por F"]),
+ mk("Música en el cielo","Cuarto azul",["Un recuerdo cariñoso a alguien de su familia","Es un homenaje a su abuelo","Es de Aitana, de Cuarto azul","Empieza por M"]),
+ mk("Cuando hables con él","Cuarto azul",["Una balada íntima que muchos leen como una carta a una expareja","Al principio no pensaba incluirla en el álbum","Es de Aitana, de Cuarto azul","Empieza por C"]),
+ mk("Duele un montón despedirme de ti","Colaboraciones",["Una despedida que cuesta muchísimo","Es un dúo con un cantante puertorriqueño","Es de Aitana, de Cuarto azul","Empieza por D"]),
+ mk("Corazón sin vida","11 Razones",["Un dúo con un cantante colombiano que dialoga con un clásico de Alejandro Sanz","Alejandro Sanz participó como coautor","Es de Aitana y Sebastián Yatra","Empieza por C"]),
+ mk("Lo malo","Primeros años",["Un dúo de dos amigas de un concurso de talentos, candidato a Eurovisión","Fue número 1 y cinco veces platino","Es de Aitana y Ana Guerra","Empieza por L"]),
+ mk("Teléfono","Primeros años",["El primer gran éxito en solitario de una joven salida de un concurso","Pasó seis semanas en lo más alto de las listas","Es de Aitana","Empieza por T"]),
+ mk("Arde","Primeros años",["Su propuesta en solitario para representar a España en Eurovisión 2018","Se estrenó en Operación Triunfo","Es de Aitana","Empieza por A"]),
+ mk("Tu fan","Mafalda Cardenal",["Escrita con el corazón roto y olvidada entre audios de WhatsApp","Se hizo viral en TikTok en 2023","Es de Mafalda Cardenal","Empieza por T"]),
+ mk("Solo un nombre","Mafalda Cardenal",["Después de una ruptura, su propio nombre ya no suena igual","Fue un avance de su álbum debut","Es de Mafalda Cardenal","Empieza por S"]),
+ mk("No estábamos juntos","Mafalda Cardenal",["Una historia de amor propio, según Rolling Stone","Salió como single antes del álbum","Es de Mafalda Cardenal","Empieza por N"]),
+ mk("Vete a la luna","Mafalda Cardenal",["La primera balada de un álbum, contada con humor","Es la pista 17 de 18","Es de Mafalda Cardenal","Empieza por V"]),
+ mk("Esto iba a ser una canción de amor","Mafalda Cardenal",["Una canción sencilla y sincera que iba a ser otra cosa","Salió como avance del álbum","Es de Mafalda Cardenal","Empieza por E"]),
+ mk("Superhumano","Mafalda Cardenal",["La canción que cierra su álbum debut","Es la pista 18 de 18","Es de Mafalda Cardenal","Empieza por S"]),
+ mk("A ella la llevas a París","Mafalda Cardenal",["Una historia de desamor sobre alguien que lleva a otra persona a una ciudad romántica","Es una de sus canciones más escuchadas","Es de Mafalda Cardenal","Empieza por A"]),
+ mk("Pa que me cantes en el coche","Mafalda Cardenal",["Un tema para cantar a todo pulmón en un viaje en coche","Es una de sus canciones con más reproducciones","Es de Mafalda Cardenal","Empieza por P"]),
+ mk("Mon amour","Colaboraciones",["Un tema que, en versión remix, se convirtió en fenómeno en España y México","Es diez veces platino y llegó al número 1 en 2021","Es de Aitana y Zzoilo","Empieza por M"],"mon amour remix"),
+ mk("Gran Vía","Colaboraciones",["Un dúo con un cantante canario que llegó al número 1","Es cuatro veces platino y su título es una calle muy famosa de Madrid","Es de Aitana y Quevedo","Empieza por G"],"gran via"),
+ mk("Mariposas","Colaboraciones",["Un dúo con un cantante italiano que tiene versión en su idioma","La versión italiana se llama Farfalle","Es de Aitana y Sangiovanni","Empieza por M"]),
+ mk("Superestrella","Cuarto azul",["El cuarto single de Cuarto azul, publicado el 31 de octubre de 2025","Es seis veces platino y llegó al número 1 en México","Es de Aitana","Empieza por S"]),
+ mk("6 de febrero","Cuarto azul",["Una balada new wave con una fecha por título","Llegó al puesto 2 y es triple platino","Es de Aitana, de Cuarto azul","Empieza por 6"]),
+ mk("Segundo intento","Cuarto azul",["El primer adelanto de su cuarto álbum, publicado en enero de 2025","Es disco de platino","Es de Aitana","Empieza por S"]),
+ mk("Sentimiento natural","Cuarto azul",["Un dúo con un cantante puertorriqueño y sonidos tropicales","Fue su primer top 10 de la era de Cuarto azul","Es de Aitana y Myke Towers","Empieza por S"]),
+ mk("Cuando te fuiste","Colaboraciones",["Un dúo de un álbum que cuenta las razones para dejar a una pareja ficticia","Fue la mejor colaboración femenina en streaming de 2020","Es de Aitana y Natalia Lacunza","Empieza por C"]),
+ mk("11 Razones","11 Razones",["La canción que da título a un álbum sobre dejar a una pareja ficticia","Es doble platino","Es de Aitana","Empieza por 1"],"once razones"),
+ mk("+ (Más)","11 Razones",["Un dúo con dos cantantes colombianos que lleva un signo matemático por título","Es triple platino y llegó al puesto 2","Es de Aitana con Cali y El Dandee","Empieza por M"]),
+ mk("Si tú la quieres","Colaboraciones",["Un dúo grabado desde casa durante la pandemia","Es cuatro veces platino","Es de Aitana y David Bisbal","Empieza por S"]),
+ mk("Presiento","Colaboraciones",["Un dúo con un grupo colombiano que aparece en su álbum Balas perdidas","Es cuatro veces platino","Es de Aitana y Morat","Empieza por P"]),
+ mk("Tu foto del DNI","Colaboraciones",["Una colaboración que llegó al puesto 5 en 2020","Es doble platino y suena en los conciertos de Aitana","Es de Marmi y Aitana","Empieza por T"],"tu foto del dni"),
+ mk("Friend de Semana","Colaboraciones",["Una colaboración a tres voces con una cantante mexicana y una brasileña","Pertenece al álbum K.O., de Danna Paola","Es de Aitana, Danna Paola y Luísa Sonza","Empieza por F"]),
+ mk("Mi amor","Alpha",["Una colaboración de Alpha con el título escrito todo junto","Es doble platino","Es de Aitana y Rels B","Empieza por M"],"miamor"),
+ mk("Enemigos","Colaboraciones",["Un dúo con un trío mexicano que no pertenece a ningún álbum","Salió en 2020 y es disco de platino","Es de Aitana y Reik","Empieza por E"]),
+ mk("Berlín","Singles sueltos",["Un single suelto de 2021 con nombre de capital europea","Es dos veces platino","Es de Aitana","Empieza por B"],"berlin"),
+ mk("No te has ido y ya te extraño","11 Razones",["La canción que abre un álbum sobre dejar a una pareja ficticia","Su título habla de echar de menos a alguien que todavía está","Es de Aitana, de 11 Razones","Empieza por N"]),
+ mk("En mi balcón","Mafalda Cardenal",["El single que abrió la preventa del álbum, más de un mes antes de su lanzamiento","Es la pista 10 de Mis notas de voz","Es de Mafalda Cardenal","Empieza por E"],"en mi balcon"),
+ mk("¿Qué significa el amor?","Mafalda Cardenal",["Una colaboración en el repertorio de un cantante mexicano","Su título es una pregunta","Es de Carlos Rivera con Mafalda Cardenal","Empieza por Q"],"que significa el amor"),
+ mk("32 de agosto","Mafalda Cardenal",["El primer single de una cantante alicantina, en 2021","Su título es una fecha que no existe","Es de Mafalda Cardenal","Empieza por 3"]),
+ mk("Nada mal","Mafalda Cardenal",["La canción que abre su segundo álbum","Es la pista 1 de 12 de Belonia","Es de Mafalda Cardenal","Empieza por N"]),
+ mk("Creo que te quiero","Mafalda Cardenal",["Un avance de Belonia, un álbum optimista sobre el amor y dejar atrás los malos rollos","Es la pista 9 de 12","Es de Mafalda Cardenal","Empieza por C"]),
+ mk("Desde que no estás","Mafalda Cardenal",["Un avance de Belonia, su segundo álbum","Es la pista 8 de 12","Es de Mafalda Cardenal","Empieza por D"],"desde que no estas"),
+ mk("Gigantes","Mafalda Cardenal",["Un avance de Belonia, su segundo álbum","Es la pista 5 de 12 y va justo antes de Un segundo","Es de Mafalda Cardenal","Empieza por G"])
+],"Adivina la canción por de qué trata");
+
+/* ---------- Filtros globales ---------- */
+function applyTipo(){
+  let first=null,cur=null;
+  document.querySelectorAll("#tabs button").forEach(b=>{
+    const v=G.tipo==="Todos"||TYPE[b.dataset.t]===G.tipo;b.hidden=!v;
+    if(v&&!first)first=b;if(v&&b.getAttribute("aria-selected")==="true")cur=b;
+  });
+  if(!cur&&first)first.click();
+}
+$("#ftipo").onchange=e=>{G.tipo=e.target.value;applyTipo()};
+$("#fcat").onchange=e=>{G.cat=e.target.value;HOOKS.forEach(f=>f())};
+$("#ftema").onchange=e=>{G.tema=e.target.value;HOOKS.forEach(f=>f())};
+</script>
+</body>
+</html>
